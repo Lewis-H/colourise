@@ -1,6 +1,8 @@
 package colourise.networking;
 
+import java.io.IOException;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -11,7 +13,6 @@ public final class Server {
     private Selector selector;
     private ServerSocketChannel ssc;
     private Listener listener;
-    private Map<SocketChannel, Connection> connections = new HashMap<>();
     private boolean run = true;
 
     public Server(Selector selector, ServerSocketChannel ssc, Listener listener) {
@@ -29,9 +30,9 @@ public final class Server {
                 while(it.hasNext()) {
                     SelectionKey key = (SelectionKey) it.next();
                     if((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT) {
-                        accept(ssc.accept().getChannel());
+                        accept();
                     } else if((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
-                        read((SocketChannel)key.channel());
+                        read((SocketChannel) key.channel(), (Connection) key.attachment());
                     }
                 }
                 keys.clear();
@@ -39,16 +40,20 @@ public final class Server {
         }
     }
 
-    private void accept(SocketChannel sc) {
-        sc.configureBlocking(false);
-        sc.register(selector, SelectionKey.OP_READ);
-        Connection c = new Connection(sc);
-        connections.put(sc, c);
-        listener.connected(c);
+    private void accept() {
+        try {
+            SocketChannel sc = ssc.accept();
+            sc.configureBlocking(false);
+            Connection c = new Connection(sc);
+            sc.register(selector, SelectionKey.OP_READ, c);
+            listener.connected(c);
+        }catch(IOException ex){
+
+        }
     }
 
-    private void read(SocketChannel sc) {
-
+    private void read(SocketChannel sc, Connection c) {
+        listener.read(c);
     }
 
 

@@ -13,7 +13,7 @@ public final class Binder {
 
     public static Server listen(InetSocketAddress address, Listener listener) throws IOException {
         Selector selector = Selector.open();
-        ServerSocketChannel ssc = selector.provider().openServerSocketChannel();
+        ServerSocketChannel ssc = ServerSocketChannel.open();
         ssc.configureBlocking(false);
         ssc.register(selector, SelectionKey.OP_ACCEPT);
         ssc.bind(address);

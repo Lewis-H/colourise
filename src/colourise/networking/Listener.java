@@ -5,5 +5,5 @@ public interface Listener {
 
     void disconnected(Connection c);
 
-    void received(Connection c, byte[] data);
+    void read(Connection c);
 }
