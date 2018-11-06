@@ -1,41 +1,72 @@
 package colourise.server;
 
+import colourise.networking.Connection;
+
 import java.util.*;
 
 public class Match {
-    private final int rows = 6, columns = 10;
-    private Set<Player> players = new HashSet<>(5);
-    private Player[][] grid = new Player[rows][columns];
-    private Set<Player> blocked = new HashSet<>(5);
-    private Map<Player, Set<Card>> cards = new HashMap<>();
-    private Iterator<Player> iterator = players.iterator();
-    private Player turn;
+    public static final int MAX_PLAYERS = 5;
+    private final int rows = 6,
+                      columns = 10;
+    private final Set<Player> players = new HashSet<>(MAX_PLAYERS),
+                              blocked = new HashSet<>(5);
+    private final Player[][] grid = new Player[rows][columns];
+    private final Map<Player, Integer> scoreboard = new HashMap<>(MAX_PLAYERS);
+    private Iterator<Player> iterator;
+    private Player current;
 
-    public Match(Player[] players) {
-        for(Player player : players) {
-            this.players.add(player);
-            cards.put(player, new HashSet<Card>(3));
-            cards.get(player).add(Card.DoubleMove);
-            cards.get(player).add(Card.Freedom);
-            cards.get(player).add(Card.Replacement);
+    public Player getCurrent() {
+        return current;
+    }
+
+    public Map<Player, Integer> getScoreboard() {
+        return new HashMap<>(scoreboard);
+    }
+
+    public Set<Player> getPlayers() {
+        return new HashSet<>(players);
+    }
+
+    public Match(Connection[] connections) {
+        if(connections.length > MAX_PLAYERS)
+            return; // Add exception
+        for(Connection connection : connections) {
+            Player player = new Player(connection, this, 0);
+            players.add(player);
+            scoreboard.put(player, 0);
         }
+        iterator = this.players.iterator();
+        current = iterator.next();
     }
 
     public void play(int row, int column, Player player, Card card) {
-        if(adjacent(row, column, player) && !occupied(row, column)) grid[row][column] = player;
+        if(player != getCurrent())
+            return; // Add exception
+        place(row, column, player, card);
+        increment(player);
         refresh();
+    }
+
+    private void place(int row, int column, Player player, Card card) {
+        if((card == Card.Freedom || adjacent(row, column, player)) && (card == Card.Replacement || !occupied(row, column))) {
+            if(occupied(row, column))
+                decrement(get(row, column));
+            grid[row][column] = player;
+        }else{
+            return; // Add exception
+        }
+    }
+
+    private void increment(Player player) {
+        scoreboard.put(player, scoreboard.get(player) + 1);
+    }
+
+    private void decrement(Player player) {
+        scoreboard.put(player, scoreboard.get(player) - 1);
     }
 
     private Player get(int row, int column) {
         return grid[row][column];
-    }
-
-    private void use(Player player, Card card) {
-        cards.get(player).remove(card);
-    }
-
-    private boolean has(Player player, Card card) {
-        return cards.get(player).contains(card);
     }
 
     private boolean occupied(int row, int column) {
@@ -49,14 +80,18 @@ public class Match {
         return true;
     }
 
+    private boolean blocked(Player player) {
+        return blocked.contains(player);
+    }
+
     private boolean adjacent(int row, int column, Player player) {
         for(int r = row - 1; r <= row + 1; r++)
             for(int c = column - 1; c <= column + 1; c++)
-                if(inBounds(r, c) && get(r, c) == player) return true;
+                if(valid(r, c) && get(r, c) == player) return true;
         return false;
     }
 
-    private boolean inBounds(int row, int column) {
+    private boolean valid(int row, int column) {
         return row >= 0 && column >= 0 && row < rows && column < columns;
     }
 
@@ -66,23 +101,24 @@ public class Match {
         for(int r = 0; r <= rows; r++) {
             for (int c = 0; c <= columns; c++) {
                 Player player = get(r, c);
-                if((has(player, Card.Freedom) || has(player, Card.Replacement)) && !free.contains(player) && !blocked.contains(player) && !blocked(r, c))
+                if((player.has(Card.Freedom) || player.has(Card.Replacement)) && !free.contains(player) && !blocked(player) && !blocked(r, c))
                     free.add(player);
             }
         }
         for(Player player : players) {
-            if(!free.contains(player) && !blocked.contains(player))
+            if(!free.contains(player) && !blocked(player))
                 blocked.add(player);
         }
-        // Find the next (free) player
+        // Set the next (free) player
+        if(free.isEmpty())
+            return; // Add exception
         while(true) {
             if(!iterator.hasNext()) iterator = players.iterator();
             Player player = iterator.next();
-            if(!blocked.contains(player)) {
-                turn = player;
+            if(!blocked(player)) {
+                current = player;
                 break;
             }
         }
     }
-
 }
