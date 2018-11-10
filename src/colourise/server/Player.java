@@ -11,6 +11,10 @@ public class Player {
     private final int colour;
     private Set<Card> cards = new HashSet<>(3);
 
+    public Connection getConnection() {
+        return connection;
+    }
+
     public Player(Connection connection, Match match, int colour) {
         this.connection = connection;
         this.match = match;
@@ -33,5 +37,9 @@ public class Player {
 
     public boolean has(Card card) {
         return cards.contains(card);
+    }
+
+    public void leave() {
+        match.leave(this);
     }
 }

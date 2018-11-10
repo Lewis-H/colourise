@@ -32,7 +32,7 @@ public final class Server {
                     if((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT) {
                         accept();
                     } else if((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
-                        read((SocketChannel) key.channel(), (Connection) key.attachment());
+                        read((Connection) key.attachment());
                     }
                 }
                 keys.clear();
@@ -52,7 +52,7 @@ public final class Server {
         }
     }
 
-    private void read(SocketChannel sc, Connection c) {
+    private void read(Connection c) {
         listener.read(c);
     }
 

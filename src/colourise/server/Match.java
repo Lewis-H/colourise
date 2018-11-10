@@ -12,6 +12,7 @@ public class Match {
                               blocked = new HashSet<>(5);
     private final Player[][] grid = new Player[rows][columns];
     private final Map<Player, Integer> scoreboard = new HashMap<>(MAX_PLAYERS);
+    private Colourise server;
     private Iterator<Player> iterator;
     private Player current;
 
@@ -27,9 +28,10 @@ public class Match {
         return new HashSet<>(players);
     }
 
-    public Match(Connection[] connections) {
-        if(connections.length > MAX_PLAYERS)
-            return; // Add exception
+    public Match(Colourise server, Collection<Connection> connections) {
+        // This should always be the case, as enforced by the Lobby.
+        assert connections.size() <= MAX_PLAYERS;
+        this.server = server;
         for(Connection connection : connections) {
             Player player = new Player(connection, this, 0);
             players.add(player);
@@ -120,5 +122,9 @@ public class Match {
                 break;
             }
         }
+    }
+
+    public void leave(Player player) {
+
     }
 }
