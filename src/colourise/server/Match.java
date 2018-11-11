@@ -12,7 +12,7 @@ public class Match {
                               blocked = new HashSet<>(5);
     private final Player[][] grid = new Player[rows][columns];
     private final Map<Player, Integer> scoreboard = new HashMap<>(MAX_PLAYERS);
-    private Colourise server;
+    private Colourise game;
     private Iterator<Player> iterator;
     private Player current;
 
@@ -28,16 +28,16 @@ public class Match {
         return new HashSet<>(players);
     }
 
-    public Match(Colourise server, Collection<Connection> connections) {
+    public Match(Colourise game, Collection<Connection> connections) {
         // This should always be the case, as enforced by the Lobby.
         assert connections.size() <= MAX_PLAYERS;
-        this.server = server;
+        this.game = game;
         for(Connection connection : connections) {
             Player player = new Player(connection, this, 0);
             players.add(player);
             scoreboard.put(player, 0);
         }
-        iterator = this.players.iterator();
+        iterator = players.iterator();
         current = iterator.next();
     }
 
@@ -45,15 +45,19 @@ public class Match {
         if(player != getCurrent())
             return; // Add exception
         place(row, column, player, card);
-        increment(player);
         refresh();
     }
 
     private void place(int row, int column, Player player, Card card) {
+        if(!valid(row, column)) return; // Add exception
         if((card == Card.Freedom || adjacent(row, column, player)) && (card == Card.Replacement || !occupied(row, column))) {
+            // If the space is occupied (i.e. the replacement card has been used) then decrement the score of the player occupying the space
             if(occupied(row, column))
                 decrement(get(row, column));
+            // Place the player in the grid position
             grid[row][column] = player;
+            // Increment the player's score
+            increment(player);
         }else{
             return; // Add exception
         }
@@ -114,6 +118,10 @@ public class Match {
         // Set the next (free) player
         if(free.isEmpty())
             return; // Add exception
+        next();
+    }
+
+    private void next() {
         while(true) {
             if(!iterator.hasNext()) iterator = players.iterator();
             Player player = iterator.next();
@@ -125,6 +133,25 @@ public class Match {
     }
 
     public void leave(Player player) {
+        players.remove(player);
+        blocked.remove(player);
+        if(players.size() == 0) {
+            finish();
+        } else {
+            if (current == player) {
+                iterator.remove();
+                next();
+            } else {
+                iterator = players.iterator();
+                Player c = current;
+                do {
+                    this.current = iterator.next();
+                } while (current != c);
+            }
+        }
+    }
 
+    private void finish() {
+        game.finished(this);
     }
 }

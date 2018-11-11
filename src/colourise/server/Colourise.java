@@ -24,8 +24,11 @@ public class Colourise implements Listener {
 
     @Override
     public void disconnected(Connection c) {
-        if(players.containsKey(c)) {
+        Player player = players.get(c);
+        if(player != null) {
             // Player is in a game.
+            player.leave();
+            players.remove(player.getConnection());
         }else{
             // Player is in the lobby.
             lobby.leave(c);
@@ -44,5 +47,10 @@ public class Colourise implements Listener {
     public void started(Match match) {
         for(Player player : match.getPlayers())
             players.put(player.getConnection(), player);
+    }
+
+    public void finished(Match match) {
+        for(Player player : match.getPlayers())
+            players.remove(player.getConnection());
     }
 }
