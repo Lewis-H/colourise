@@ -7,7 +7,7 @@ public class Parser {
 
     // Get remaining arguments to be filled
     public int getRemaining() {
-        return Command.getLength(command) - getCount();
+        return command != null ? Command.getLength(command) - getCount() : 1;
     }
 
     // Get arguments added

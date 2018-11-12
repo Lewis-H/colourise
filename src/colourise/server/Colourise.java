@@ -1,9 +1,13 @@
 package colourise.server;
 
+import colourise.networking.Binder;
 import colourise.networking.Connection;
 import colourise.networking.Listener;
 import colourise.networking.Server;
+import colourise.networking.protocol.Message;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,9 +16,13 @@ public class Colourise implements Listener {
     private Lobby lobby;
     private Server server;
 
-    public Colourise(Server server) {
-        this.server = server;
+    public Colourise(InetSocketAddress address) throws IOException {
         lobby = new Lobby(this);
+        server = Binder.listen(address, this);
+    }
+
+    public void listen() throws IOException {
+        server.listen();
     }
 
     @Override
@@ -37,6 +45,14 @@ public class Colourise implements Listener {
 
     @Override
     public void read(Connection c) {
+        byte[] bytes = c.read(c.getParser().getRemaining());
+        if(c.getParser().getRemaining() == 0) {
+            received(c, c.getParser().create());
+            c.getParser().reset();
+        }
+    }
+
+    private void received(Connection c, Message m) {
         if(players.containsKey(c)) {
             // Player is in a game.
         }else{

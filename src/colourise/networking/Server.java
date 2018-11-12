@@ -15,13 +15,18 @@ public final class Server {
     private Listener listener;
     private boolean run = true;
 
+    Selector getSelector() {
+        return selector;
+    }
+
     public Server(Selector selector, ServerSocketChannel ssc, Listener listener) {
         this.selector = selector;
         this.ssc = ssc;
         this.listener = listener;
     }
 
-    private void listen() {
+    public void listen() throws IOException {
+        run = true;
         while(run) {
             int n = selector.select();
             if(n != 0) {
@@ -35,16 +40,19 @@ public final class Server {
                         read((Connection) key.attachment());
                     }
                 }
-                keys.clear();
             }
         }
+    }
+
+    public void pause() {
+        run = false;
     }
 
     private void accept() {
         try {
             SocketChannel sc = ssc.accept();
             sc.configureBlocking(false);
-            Connection c = new Connection(sc);
+            Connection c = new Connection(this, sc);
             sc.register(selector, SelectionKey.OP_READ, c);
             listener.connected(c);
         }catch(IOException ex){
@@ -56,5 +64,7 @@ public final class Server {
         listener.read(c);
     }
 
-
+    void disconnected(Connection c) {
+        listener.disconnected(c);
+    }
 }
