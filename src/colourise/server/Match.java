@@ -28,6 +28,10 @@ public class Match {
         return new HashSet<>(players);
     }
 
+    public Colourise getGame() {
+        return game;
+    }
+
     public Match(Colourise game, Collection<Connection> connections) {
         // This should always be the case, as enforced by the Lobby.
         assert connections.size() <= MAX_PLAYERS;
@@ -138,7 +142,7 @@ public class Match {
         if(players.size() == 0) {
             finish();
         } else {
-            if (current == player) {
+            if(current == player) {
                 iterator.remove();
                 next();
             } else {
@@ -149,6 +153,13 @@ public class Match {
                 } while (current != c);
             }
         }
+        game.leave(player);
+    }
+
+    public int write(Message m) {
+        byte[] bytes = m.getBytes();
+        for(Player p : players)
+            p.getConnection().write(bytes);
     }
 
     private void finish() {

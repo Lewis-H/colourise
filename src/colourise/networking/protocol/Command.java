@@ -1,11 +1,12 @@
 package colourise.networking.protocol;
 
 public enum Command {
-    JOIN,
+    JOINED,
     LEAVE,
+    LEFT,
     BEGIN,
-    PLACE,
-    PLACED,
+    PLAY,
+    PLAYED,
     END;
 
     // Expensive operation, cached here
@@ -15,21 +16,31 @@ public enum Command {
         return values[i];
     }
 
+    public byte toByte() {
+        return ordinal();
+    }
+
     public static int getLength(Command command) {
         switch(command) {
-            case JOIN:
-                // 4 arguments: identifier, red, blue, green
-                return 4;
+            case HELLO:
+                // 2 arguments: leader flag, count
+                return 1;
+            case JOINED:
+                // 1 argument: count
+                return 1;
             case LEAVE:
-                // 1 argument: identifier
+                // No arguments, player is leaving
+                return 0;
+            case LEFT:
+                // 1 argument: identifier/count (match/lobby)
                 return 1;
             case BEGIN:
-                // No arguments, marks beginning of a game
-                return 0;
-            case PLACE:
-                // 2 arguments: x, y
+                // 2 arguments: identifier, player count
                 return 2;
-            case PLACED:
+            case PLAY:
+                // 3 arguments: x, y, card
+                return 3;
+            case PLAYED:
                 // 3 arguments: identifier, x, y
                 return 3;
             case END:

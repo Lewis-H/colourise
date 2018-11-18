@@ -5,20 +5,30 @@ import colourise.networking.Connection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Player {
+public final class Player {
     private final Connection connection;
     private final Match match;
-    private final int colour;
-    private Set<Card> cards = new HashSet<>(3);
+    private final Set<Card> cards = new HashSet<>(3);
+    private final int identifier;
+    private final Colourise game;
 
     public Connection getConnection() {
         return connection;
     }
 
-    public Player(Connection connection, Match match, int colour) {
+    public Match getMatch() {
+        return match;
+    }
+
+    public int getIdentifier() {
+        return identifier;
+    }
+
+    public Player(Connection connection, Match match, int identifier) {
         this.connection = connection;
         this.match = match;
-        this.colour = colour;
+        this.identifier = identifier;
+        this.game = match.getGame();
         cards.add(Card.DoubleMove);
         cards.add(Card.Freedom);
         cards.add(Card.Replacement);
@@ -37,6 +47,10 @@ public class Player {
 
     public boolean has(Card card) {
         return cards.contains(card);
+    }
+
+    public int write(Message m) {
+        game.write(this, m);
     }
 
     public void leave() {

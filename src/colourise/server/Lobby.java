@@ -7,8 +7,16 @@ import java.util.Set;
 
 public class Lobby {
     private Connection leader = null;
-    private Set<Connection> connections = new HashSet<>(5);
-    private Colourise game;
+    private final Set<Connection> connections = new HashSet<>(5);
+    private final Colourise game;
+
+    public Connection getLeader() {
+        return leader;
+    }
+
+    public Set<Connection> count() {
+        return connections.size();
+    }
 
     public Lobby(Colourise game) {
         this.game = game;
@@ -33,5 +41,11 @@ public class Lobby {
         connections.remove(connection);
         if(connection == leader)
             leader = connections.isEmpty() ? null : connections.iterator().next();
+    }
+
+    public int write(Message m) {
+        byte[] bytes = m.getBytes();
+        for(Connection c : connections)
+            c.write(bytes);
     }
 }

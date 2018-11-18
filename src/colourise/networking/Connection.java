@@ -9,15 +9,10 @@ import java.util.Arrays;
 
 public class Connection {
     private final SocketChannel sc;
-    private final Parser parser = new Parser();
     private final Server server;
 
     SocketChannel getSocketChannel() {
         return sc;
-    }
-
-    public Parser getParser() {
-        return parser;
     }
 
     Connection(Server server, SocketChannel sc) {
