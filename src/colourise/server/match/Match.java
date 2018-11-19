@@ -1,8 +1,10 @@
-package colourise.server;
+package colourise.server.match;
 
 import colourise.networking.Connection;
 import colourise.networking.protocol.Card;
 import colourise.networking.protocol.Message;
+import colourise.server.Colourise;
+import colourise.server.Player;
 
 import java.util.*;
 
@@ -14,9 +16,10 @@ public class Match {
                               blocked = new HashSet<>(5);
     private final Player[][] grid = new Player[rows][columns];
     private final Map<Player, Integer> scoreboard = new HashMap<>(MAX_PLAYERS);
-    private final Colourise game;
     private Iterator<Player> iterator;
     private Player current;
+    private Player winner;
+    private boolean finished = false;
 
     public Player getCurrent() {
         return current;
@@ -30,14 +33,13 @@ public class Match {
         return new HashSet<>(players);
     }
 
-    public Colourise getGame() {
-        return game;
+    public boolean isFinished() {
+        return finished;
     }
 
-    public Match(Colourise game, Collection<Connection> connections) {
+    public Match(Collection<Connection> connections) {
         // This should always be the case, as enforced by the Lobby.
         assert connections.size() <= MAX_PLAYERS;
-        this.game = game;
         for(Connection connection : connections) {
             Player player = new Player(connection, this, 0);
             players.add(player);
@@ -47,9 +49,11 @@ public class Match {
         current = iterator.next();
     }
 
-    public void play(int row, int column, Player player, Card card) {
+    public void play(int row, int column, Player player, Card card) throws MatchFinishedException {
         if(player != getCurrent())
             return; // Add exception
+        if(isFinished())
+            throw new MatchFinishedException(this);
         place(row, column, player, card);
         refresh();
     }
@@ -107,7 +111,7 @@ public class Match {
         return row >= 0 && column >= 0 && row < rows && column < columns;
     }
 
-    private void refresh() {
+    private void refresh() throws MatchFinishedException {
         // Find the blocked players
         Set<Player> free = new HashSet<>(players.size() - blocked.size());
         for(int r = 0; r <= rows; r++) {
@@ -123,7 +127,7 @@ public class Match {
         }
         // Set the next (free) player
         if(free.isEmpty())
-            return; // Add exception
+            finish();
         next();
     }
 
@@ -138,10 +142,10 @@ public class Match {
         }
     }
 
-    public void leave(Player player) {
+    public void leave(Player player) throws MatchFinishedException {
         players.remove(player);
         blocked.remove(player);
-        if(players.size() == 0) {
+        if(players.size() - blocked.size() == 0) {
             finish();
         } else {
             if(current == player) {
@@ -155,7 +159,6 @@ public class Match {
                 } while (current != c);
             }
         }
-        game.leave(player);
     }
 
     public void write(Message m) {
@@ -164,7 +167,8 @@ public class Match {
             p.getConnection().write(bytes);
     }
 
-    private void finish() {
-        game.finished(this);
+    private void finish() throws MatchFinishedException {
+        finished = true;
+        throw new MatchFinishedException(this);
     }
 }

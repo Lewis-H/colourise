@@ -5,6 +5,10 @@ import colourise.networking.Connection;
 import colourise.networking.Listener;
 import colourise.networking.Server;
 import colourise.networking.protocol.*;
+import colourise.server.lobby.Lobby;
+import colourise.server.lobby.MatchStartedException;
+import colourise.server.match.Match;
+import colourise.server.match.MatchFinishedException;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -18,7 +22,7 @@ public class Colourise implements Listener {
     private Server server;
 
     public Colourise(InetSocketAddress address) throws IOException {
-        lobby = new Lobby(this);
+        lobby = new Lobby();
         server = Binder.listen(address, this);
     }
 
@@ -37,20 +41,29 @@ public class Colourise implements Listener {
     }
 
     public void join(Connection c) {
-        lobby.join(c);
-        write(c, new Message(Command.HELLO, new byte[] { (byte) (c == lobby.getLeader() ? 1 : 0) }));
-        lobby.write(new Message(Command.JOINED, new byte[] { (byte) lobby.count() }));
+        try {
+            lobby.join(c);
+            write(c, Message.Factory.hello(c == lobby.getLeader()));
+            lobby.write(Message.Factory.joined(lobby.count()));
+        } catch(MatchStartedException ex) {
+            started(ex.getMatch());
+        }
     }
 
     @Override
     public void disconnected(Connection c) {
         Player player = players.get(c);
         if(player != null) { // Player is in a game.
-            player.leave();
-            player.getMatch().write(new Message(Command.LEFT, new byte[] { (byte) player.getIdentifier() }));
+            try {
+                player.leave();
+            } catch(MatchFinishedException ex) {
+                finished(ex.getMatch());
+            }
+            players.remove(c);
+            player.getMatch().write(Message.Factory.left(player.getIdentifier()));
         } else { // Player is in the lobby.
             lobby.leave(c);
-            lobby.write(new Message(Command.LEFT, new byte[] { (byte) lobby.count() }));
+            lobby.write(Message.Factory.left(lobby.count()));
         }
         parsers.remove(c);
     }
@@ -60,32 +73,32 @@ public class Colourise implements Listener {
         parser(c).add(c.read(parser(c).getRemaining()));
         if(parser(c).getRemaining() == 0) {
             Player p = players.get(c);
-            Message m = parser(c).create();
-            if(p != null)
-                received(p, m);
-            else
-                received(c, m);
-            parser(c).reset();
+            if(p != null) {
+                received(p, parser(c).create());
+                parser(c).reset();
+            }
         }
     }
 
-    private void received(Connection c, Message m) {
-        return; // Implement
-    }
-
     private void received(Player p, Message m) {
-        switch(m.getCommand()) {
-            case LEAVE:
-                p.leave();
-                p.getMatch().write(new Message(Command.LEFT, new byte[] { (byte) p.getIdentifier() }));
-                break;
-            case PLAY:
-                p.play(m.getArgument(0), m.getArgument(1), Card.fromInt(m.getArgument(2)));
-                p.getMatch().write(new Message(Command.PLAYED, new byte[] { (byte) p.getIdentifier(), m.getArgument(0), m.getArgument(1) }));
-                break;
-            default:
-                // Unrecognised command
-                return;
+        try {
+            switch(m.getCommand()) {
+                case LEAVE:
+                    p.leave();
+                    p.getMatch().write(Message.Factory.left(p.getIdentifier()));
+                    players.remove(p.getConnection());
+                    join(p.getConnection());
+                    break;
+                case PLAY:
+                    p.play(m.getArgument(0), m.getArgument(1), Card.fromInt(m.getArgument(2)));
+                    p.getMatch().write(Message.Factory.played(p.getIdentifier(), m.getArgument(0), m.getArgument(1)));
+                    break;
+                default:
+                    // Unrecognised command
+                    return;
+            }
+        } catch (MatchFinishedException ex) {
+            finished(ex.getMatch());
         }
     }
 
@@ -94,18 +107,22 @@ public class Colourise implements Listener {
     }
 
     public void started(Match match) {
-        for(Player player : match.getPlayers())
+        for(Player player : match.getPlayers()) {
             players.put(player.getConnection(), player);
+            if(parser(player.getConnection()).getRemaining() == 0) {
+                received(player, parser(player.getConnection()).create());
+                parser(player.getConnection()).reset();
+            }
+        }
     }
 
     public void finished(Match match) {
+        int[] scores = new int[5];
+        int i = 0;
+        for(Integer s : match.getScoreboard().values())
+            scores[i++] = s;
+        match.write(Message.Factory.end(scores[0], scores[1], scores[2], scores[3], scores[4]));
         for(Player player : match.getPlayers())
             players.remove(player.getConnection());
-    }
-
-    public void leave(Player p) {
-        players.remove(p.getConnection());
-        if(p.getConnection().isConnected())
-            join(p.getConnection());
     }
 }

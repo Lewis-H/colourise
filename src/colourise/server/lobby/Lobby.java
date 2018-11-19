@@ -1,7 +1,9 @@
-package colourise.server;
+package colourise.server.lobby;
 
 import colourise.networking.Connection;
 import colourise.networking.protocol.Message;
+import colourise.server.Colourise;
+import colourise.server.match.Match;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -9,7 +11,6 @@ import java.util.Set;
 public class Lobby {
     private Connection leader = null;
     private final Set<Connection> connections = new HashSet<>(5);
-    private final Colourise game;
 
     public Connection getLeader() {
         return leader;
@@ -19,11 +20,9 @@ public class Lobby {
         return connections.size();
     }
 
-    public Lobby(Colourise game) {
-        this.game = game;
-    }
+    public Lobby() { }
 
-    public void join(Connection connection) {
+    public void join(Connection connection) throws MatchStartedException {
         if(connections.isEmpty())
             leader = connection;
         connections.add(connection);
@@ -31,11 +30,11 @@ public class Lobby {
             initialise();
     }
 
-    private void initialise() {
-        Match match = new Match(game, connections);
+    private void initialise() throws MatchStartedException{
+        Match match = new Match(connections);
         connections.clear();
         leader = null;
-        game.started(match);
+        throw new MatchStartedException(this, match);
     }
 
     public void leave(Connection connection) {

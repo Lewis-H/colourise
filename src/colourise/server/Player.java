@@ -3,6 +3,8 @@ package colourise.server;
 import colourise.networking.Connection;
 import colourise.networking.protocol.Card;
 import colourise.networking.protocol.Message;
+import colourise.server.match.Match;
+import colourise.server.match.MatchFinishedException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +14,6 @@ public final class Player {
     private final Match match;
     private final Set<Card> cards = new HashSet<>(3);
     private final int identifier;
-    private final Colourise game;
 
     public Connection getConnection() {
         return connection;
@@ -30,13 +31,12 @@ public final class Player {
         this.connection = connection;
         this.match = match;
         this.identifier = identifier;
-        this.game = match.getGame();
         cards.add(Card.DoubleMove);
         cards.add(Card.Freedom);
         cards.add(Card.Replacement);
     }
 
-    public void play(int row, int column, Card card) {
+    public void play(int row, int column, Card card) throws MatchFinishedException {
         use(card);
         match.play(row, column, this, card);
     }
@@ -51,11 +51,7 @@ public final class Player {
         return cards.contains(card);
     }
 
-    public int write(Message m) {
-        return game.write(this.getConnection(), m);
-    }
-
-    public void leave() {
+    public void leave() throws MatchFinishedException {
         match.leave(this);
     }
 }
