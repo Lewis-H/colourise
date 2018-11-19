@@ -50,7 +50,7 @@ public final class Server {
         try {
             SocketChannel sc = ssc.accept();
             sc.configureBlocking(false);
-            Connection c = new Connection(this, sc);
+            Connection c = new Connection(sc);
             sc.register(selector, SelectionKey.OP_READ, c);
             listener.connected(c);
         }catch(IOException ex){

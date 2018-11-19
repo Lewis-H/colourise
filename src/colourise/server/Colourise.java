@@ -1,9 +1,6 @@
 package colourise.server;
 
-import colourise.networking.Binder;
-import colourise.networking.Connection;
-import colourise.networking.Listener;
-import colourise.networking.Server;
+import colourise.networking.*;
 import colourise.networking.protocol.*;
 import colourise.server.lobby.Lobby;
 import colourise.server.lobby.MatchStartedException;
@@ -40,7 +37,7 @@ public class Colourise implements Listener {
         join(c);
     }
 
-    public void join(Connection c) {
+    private void join(Connection c) {
         try {
             lobby.join(c);
             write(c, Message.Factory.hello(c == lobby.getLeader()));
@@ -70,13 +67,17 @@ public class Colourise implements Listener {
 
     @Override
     public void read(Connection c) {
-        parser(c).add(c.read(parser(c).getRemaining()));
-        if(parser(c).getRemaining() == 0) {
-            Player p = players.get(c);
-            if(p != null) {
-                received(p, parser(c).create());
-                parser(c).reset();
+        try {
+            parser(c).add(c.read(parser(c).getRemaining()));
+            if (parser(c).getRemaining() == 0) {
+                Player p = players.get(c);
+                if (p != null) {
+                    received(p, parser(c).create());
+                    parser(c).reset();
+                }
             }
+        } catch(DisconnectedException ex) {
+            disconnected(c);
         }
     }
 
@@ -87,6 +88,7 @@ public class Colourise implements Listener {
                     p.leave();
                     p.getMatch().write(Message.Factory.left(p.getIdentifier()));
                     players.remove(p.getConnection());
+                    // Rejoin lobby
                     join(p.getConnection());
                     break;
                 case PLAY:
@@ -103,7 +105,12 @@ public class Colourise implements Listener {
     }
 
     public int write(Connection c, Message m) {
-        return c.write(m.toBytes());
+        try {
+            return c.write(m.toBytes());
+        }catch(DisconnectedException ex) {
+            disconnected(c);
+            return 0;
+        }
     }
 
     public void started(Match match) {

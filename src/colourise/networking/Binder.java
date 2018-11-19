@@ -7,7 +7,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 
 public final class Binder {
-    public static void connect(InetSocketAddress address) throws IOException {
+    public static Connection connect(InetSocketAddress address) throws IOException {
 
     }
 

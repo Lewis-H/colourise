@@ -7,18 +7,16 @@ import java.util.Arrays;
 
 public class Connection {
     private final SocketChannel sc;
-    private final Server server;
 
     public boolean isConnected() {
         return sc.isConnected();
     }
 
-    Connection(Server server, SocketChannel sc) {
-        this.server = server;
+    Connection(SocketChannel sc) {
         this.sc = sc;
     }
 
-    public byte[] read(int maximum) {
+    public byte[] read(int maximum) throws DisconnectedException {
         ByteBuffer buffer = ByteBuffer.allocate(maximum);
         try {
             int received = sc.read(buffer);
@@ -35,7 +33,7 @@ public class Connection {
         return new byte[0];
     }
 
-    public boolean disconnect() {
+    public void disconnect() throws DisconnectedException {
         if(sc.isConnected()) {
             try {
                 sc.shutdownInput();
@@ -49,19 +47,15 @@ public class Connection {
                         // Closes socket and cancels selector key
                         sc.close();
                     } catch (IOException e) {
-                        // Fail-safe, in case close didn't cancel the selector key
-                        sc.keyFor(server.getSelector()).cancel();
                     } finally {
-                        server.disconnected(this);
-                        return true;
                     }
                 }
             }
         }
-        return false;
+        throw new DisconnectedException(this);
     }
 
-    public int write(byte[] bytes) {
+    public int write(byte[] bytes) throws DisconnectedException {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         try {
             int wrote = sc.write(buffer);
