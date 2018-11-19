@@ -1,6 +1,8 @@
 package colourise.server;
 
 import colourise.networking.Connection;
+import colourise.networking.protocol.Card;
+import colourise.networking.protocol.Message;
 
 import java.util.*;
 
@@ -12,7 +14,7 @@ public class Match {
                               blocked = new HashSet<>(5);
     private final Player[][] grid = new Player[rows][columns];
     private final Map<Player, Integer> scoreboard = new HashMap<>(MAX_PLAYERS);
-    private Colourise game;
+    private final Colourise game;
     private Iterator<Player> iterator;
     private Player current;
 
@@ -156,8 +158,8 @@ public class Match {
         game.leave(player);
     }
 
-    public int write(Message m) {
-        byte[] bytes = m.getBytes();
+    public void write(Message m) {
+        byte[] bytes = m.toBytes();
         for(Player p : players)
             p.getConnection().write(bytes);
     }

@@ -1,7 +1,5 @@
 package colourise.networking;
 
-import colourise.networking.protocol.Parser;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -11,8 +9,8 @@ public class Connection {
     private final SocketChannel sc;
     private final Server server;
 
-    SocketChannel getSocketChannel() {
-        return sc;
+    public boolean isConnected() {
+        return sc.isConnected();
     }
 
     Connection(Server server, SocketChannel sc) {

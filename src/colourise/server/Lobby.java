@@ -1,6 +1,7 @@
 package colourise.server;
 
 import colourise.networking.Connection;
+import colourise.networking.protocol.Message;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,7 +15,7 @@ public class Lobby {
         return leader;
     }
 
-    public Set<Connection> count() {
+    public int count() {
         return connections.size();
     }
 
@@ -43,8 +44,8 @@ public class Lobby {
             leader = connections.isEmpty() ? null : connections.iterator().next();
     }
 
-    public int write(Message m) {
-        byte[] bytes = m.getBytes();
+    public void write(Message m) {
+        byte[] bytes = m.toBytes();
         for(Connection c : connections)
             c.write(bytes);
     }

@@ -1,6 +1,7 @@
 package colourise.networking.protocol;
 
 public enum Command {
+    HELLO,
     JOINED,
     LEAVE,
     LEFT,
@@ -17,7 +18,7 @@ public enum Command {
     }
 
     public byte toByte() {
-        return ordinal();
+        return (byte) ordinal();
     }
 
     public static int getLength(Command command) {

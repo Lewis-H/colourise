@@ -1,8 +1,5 @@
 package colourise.server;
 
-import colourise.networking.Binder;
-import colourise.networking.Server;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 

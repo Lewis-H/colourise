@@ -1,8 +1,6 @@
 package colourise.networking;
 
 import java.io.IOException;
-import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -10,9 +8,9 @@ import java.nio.channels.SocketChannel;
 import java.util.*;
 
 public final class Server {
-    private Selector selector;
-    private ServerSocketChannel ssc;
-    private Listener listener;
+    private final Selector selector;
+    private final ServerSocketChannel ssc;
+    private final Listener listener;
     private boolean run = true;
 
     Selector getSelector() {

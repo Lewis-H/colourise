@@ -1,6 +1,8 @@
 package colourise.server;
 
 import colourise.networking.Connection;
+import colourise.networking.protocol.Card;
+import colourise.networking.protocol.Message;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -50,7 +52,7 @@ public final class Player {
     }
 
     public int write(Message m) {
-        game.write(this, m);
+        return game.write(this.getConnection(), m);
     }
 
     public void leave() {
