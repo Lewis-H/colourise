@@ -2,13 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="696485a3-f234-4cd2-9573-0f50e73d418b" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/src/colourise/networking/DisconnectedException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/colourise/networking/NetworkingException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/colourise/server/match/CannotPlayException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/colourise/server/match/InvalidPositionException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/colourise/server/match/NotPlayersTurnException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/colourise/networking/Binder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/colourise/networking/Binder.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/colourise/networking/Connection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/colourise/networking/Connection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/colourise/networking/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/colourise/networking/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/colourise/server/Colourise.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/colourise/server/Colourise.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/colourise/server/Colourise.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/colourise/server/Service.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/colourise/server/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/colourise/server/Player.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/colourise/server/Program.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/colourise/server/Program.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/colourise/server/lobby/Lobby.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/colourise/server/lobby/Lobby.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/colourise/server/match/Match.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/colourise/server/match/Match.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/colourise/server/match/MatchException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/colourise/server/match/MatchException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/colourise/server/match/MatchFinishedException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/colourise/server/match/MatchFinishedException.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -19,47 +25,73 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Connection.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/colourise/networking/Connection.java">
+      <file leaf-file-name="Match.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/colourise/server/match/Match.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="30" column="25" lean-forward="true" selection-start-line="30" selection-start-column="25" selection-end-line="30" selection-end-column="25" />
+            <state relative-caret-position="442">
+              <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#372#373#0" expanded="true" />
-                <element signature="e#400#401#0" expanded="true" />
+                <element signature="e#915#916#0" expanded="true" />
+                <element signature="e#948#949#0" expanded="true" />
+                <element signature="e#1002#1003#0" expanded="true" />
+                <element signature="e#1032#1033#0" expanded="true" />
+                <element signature="e#1031#1032#0" expanded="true" />
+                <element signature="e#1062#1063#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NetworkingException.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/colourise/networking/NetworkingException.java">
+      <file leaf-file-name="Lobby.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/colourise/server/lobby/Lobby.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="11" selection-start-line="11" selection-end-line="34" selection-end-column="5" />
+            <state relative-caret-position="51">
+              <caret line="3" column="33" lean-forward="true" selection-start-line="3" selection-start-column="33" selection-end-line="3" selection-end-column="33" />
               <folding>
-                <element signature="e#191#192#0" expanded="true" />
-                <element signature="e#219#220#0" expanded="true" />
+                <element signature="e#393#394#0" expanded="true" />
+                <element signature="e#414#415#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DisconnectedException.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/colourise/networking/DisconnectedException.java">
+      <file leaf-file-name="Player.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/colourise/server/Player.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
+            <state relative-caret-position="570">
+              <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
               <folding>
-                <element signature="e#141#142#0" expanded="true" />
-                <element signature="e#164#165#0" expanded="true" />
-                <element signature="e#229#230#0" expanded="true" />
-                <element signature="e#259#260#0" expanded="true" />
-                <element signature="e#327#328#0" expanded="true" />
-                <element signature="e#355#356#0" expanded="true" />
-                <element signature="e#439#440#0" expanded="true" />
-                <element signature="e#476#477#0" expanded="true" />
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CannotPlayException.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/colourise/server/match/CannotPlayException.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-59">
+              <caret line="4" column="38" selection-start-line="4" selection-start-column="38" selection-end-line="4" selection-end-column="38" />
+              <folding>
+                <element signature="e#234#235#0" expanded="true" />
+                <element signature="e#263#264#0" expanded="true" />
+                <element signature="e#290#291#0" expanded="true" />
+                <element signature="e#316#317#0" expanded="true" />
+                <element signature="e#346#347#0" expanded="true" />
+                <element signature="e#375#376#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Service.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/colourise/server/Service.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="476">
+              <caret line="123" column="13" lean-forward="true" selection-start-line="123" selection-start-column="13" selection-end-line="123" selection-end-column="13" />
+              <folding>
+                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -68,8 +100,8 @@
       <file leaf-file-name="MatchException.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/colourise/server/match/MatchException.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="4" selection-start-line="4" selection-end-line="36" />
+            <state relative-caret-position="323">
+              <caret line="19" column="5" lean-forward="true" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
               <folding>
                 <element signature="e#188#189#0" expanded="true" />
                 <element signature="e#216#217#0" expanded="true" />
@@ -78,66 +110,50 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Listener.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/colourise/networking/Listener.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" column="17" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Colourise.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/colourise/server/Colourise.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-399">
-              <caret line="65" column="5" lean-forward="true" selection-start-line="65" selection-start-column="5" selection-end-line="65" selection-end-column="5" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Binder.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/colourise/networking/Binder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+            <state relative-caret-position="238">
+              <caret line="19" column="37" lean-forward="true" selection-start-line="19" selection-start-column="37" selection-end-line="19" selection-end-column="37" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Message.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/Message.java">
+      <file leaf-file-name="InvalidPositionException.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/colourise/server/match/InvalidPositionException.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="553">
-              <caret line="52" lean-forward="true" selection-start-line="52" selection-end-line="52" />
+            <state relative-caret-position="842">
+              <caret line="54" column="1" lean-forward="true" selection-start-line="4" selection-end-line="54" selection-end-column="1" />
               <folding>
-                <element signature="e#1018#1019#0" expanded="true" />
-                <element signature="e#1105#1106#0" expanded="true" />
+                <element signature="e#217#218#0" expanded="true" />
+                <element signature="e#246#247#0" expanded="true" />
+                <element signature="e#201#202#0" expanded="true" />
+                <element signature="e#225#226#0" expanded="true" />
+                <element signature="e#250#251#0" expanded="true" />
+                <element signature="e#274#275#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Parser.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/Parser.java">
+      <file leaf-file-name="NotPlayersTurnException.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/colourise/server/match/NotPlayersTurnException.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="68">
               <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+              <folding>
+                <element signature="e#192#193#0" expanded="true" />
+                <element signature="e#221#222#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Server.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/colourise/networking/Server.java">
+      <file leaf-file-name="MatchFinishedException.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/colourise/server/match/MatchFinishedException.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="459">
-              <caret line="41" column="9" lean-forward="true" selection-start-line="41" selection-start-column="9" selection-end-line="41" selection-end-column="9" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="255">
+              <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
             </state>
           </provider>
         </entry>
@@ -158,6 +174,7 @@
       <find>Game</find>
       <find>disconnect</find>
       <find>server</find>
+      <find>// Add</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -173,23 +190,27 @@
         <option value="$PROJECT_DIR$/src/colourise/networking/protocol/Command.java" />
         <option value="$PROJECT_DIR$/src/colourise/server/Match.java" />
         <option value="$PROJECT_DIR$/src/colourise/ColouriseException.java" />
-        <option value="$PROJECT_DIR$/src/colourise/server/match/MatchException.java" />
-        <option value="$PROJECT_DIR$/src/colourise/server/match/MatchFinishedException.java" />
         <option value="$PROJECT_DIR$/src/colourise/networking/protocol/Message.java" />
         <option value="$PROJECT_DIR$/src/colourise/server/lobby/MatchFinishedException.java" />
         <option value="$PROJECT_DIR$/src/colourise/server/lobby/MatchException.java" />
         <option value="$PROJECT_DIR$/src/colourise/server/lobby/LobbyFinishedException.java" />
         <option value="$PROJECT_DIR$/src/colourise/server/lobby/LobbyException.java" />
         <option value="$PROJECT_DIR$/src/colourise/server/lobby/MatchStartedException.java" />
-        <option value="$PROJECT_DIR$/src/colourise/server/match/Match.java" />
-        <option value="$PROJECT_DIR$/src/colourise/server/lobby/Lobby.java" />
-        <option value="$PROJECT_DIR$/src/colourise/server/Player.java" />
-        <option value="$PROJECT_DIR$/src/colourise/networking/Binder.java" />
         <option value="$PROJECT_DIR$/src/colourise/networking/NetworkingException.java" />
         <option value="$PROJECT_DIR$/src/colourise/networking/DisconnectedException.java" />
-        <option value="$PROJECT_DIR$/src/colourise/networking/Connection.java" />
         <option value="$PROJECT_DIR$/src/colourise/networking/Server.java" />
         <option value="$PROJECT_DIR$/src/colourise/server/Colourise.java" />
+        <option value="$PROJECT_DIR$/src/colourise/networking/Connection.java" />
+        <option value="$PROJECT_DIR$/src/colourise/server/match/InvalidPositionException.java" />
+        <option value="$PROJECT_DIR$/src/colourise/server/match/NotPlayersTurnException.java" />
+        <option value="$PROJECT_DIR$/src/colourise/server/match/MatchFinishedException.java" />
+        <option value="$PROJECT_DIR$/src/colourise/server/match/MatchException.java" />
+        <option value="$PROJECT_DIR$/src/colourise/server/match/CannotPlayException.java" />
+        <option value="$PROJECT_DIR$/src/colourise/server/Player.java" />
+        <option value="$PROJECT_DIR$/src/colourise/networking/Binder.java" />
+        <option value="$PROJECT_DIR$/src/colourise/server/lobby/Lobby.java" />
+        <option value="$PROJECT_DIR$/src/colourise/server/match/Match.java" />
+        <option value="$PROJECT_DIR$/src/colourise/server/Service.java" />
       </list>
     </option>
   </component>
@@ -213,9 +234,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="AndroidView" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -283,6 +301,9 @@
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -385,7 +406,9 @@
       <workItem from="1542195941192" duration="555000" />
       <workItem from="1542547227018" duration="595000" />
       <workItem from="1542551823259" duration="4046000" />
-      <workItem from="1542636214478" duration="9776000" />
+      <workItem from="1542636214478" duration="9882000" />
+      <workItem from="1542812247799" duration="379000" />
+      <workItem from="1542816156625" duration="2589000" />
     </task>
     <task id="LOCAL-00001" summary="Renamed JOIN to JOINED, PLACE to PLAY and PLACED to PLAYED.&#10;Added arguments assertion (may become an exception).&#10;Added toBytes method to Message.&#10;Removed parser from Connection, added to map in Colourise.&#10;Added some packet writing.&#10;Removed colour from server side, colour will be based on identifier.">
       <created>1542555923244</created>
@@ -408,11 +431,18 @@
       <option name="project" value="LOCAL" />
       <updated>1542645590384</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Corrected signature of Binder.connect&#10;Reduced coupling of Connection and Server.">
+      <created>1542647356692</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1542647356692</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="16558000" />
+    <option name="totallyTimeSpent" value="19632000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -420,7 +450,7 @@
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Messages" order="7" sideWeight="0.49947917" weight="0.32943678" />
+      <window_info active="true" anchor="bottom" id="Messages" order="7" sideWeight="0.49947917" visible="true" weight="0.32943678" />
       <window_info anchor="right" id="Palette&#9;" order="3" />
       <window_info id="Image Layers" order="2" />
       <window_info anchor="right" id="Capture Analysis" order="3" />
@@ -432,8 +462,7 @@
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14895834" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.14895834" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -441,6 +470,7 @@
       <window_info anchor="right" id="Theme Preview" order="3" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -455,7 +485,7 @@
       <window_info anchor="bottom" id="Run" order="2" weight="0.32943678" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14895834" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14895834" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Theme Preview" order="5" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -468,12 +498,12 @@
       <window_info anchor="right" id="Database" order="6" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5005208" side_tool="true" weight="0.32943678" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Version Control" order="10" />
       <window_info id="Capture Tool" order="5" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="bottom" id="Messages" order="11" weight="0.32943678" />
+      <window_info active="true" anchor="bottom" id="Messages" order="11" sideWeight="0.49947917" visible="true" weight="0.32943678" />
       <window_info anchor="right" id="Maven Projects" order="8" />
       <window_info id="Favorites" order="6" side_tool="true" />
     </layout-to-restore>
@@ -488,56 +518,10 @@
     <MESSAGE value="Renamed JOIN to JOINED, PLACE to PLAY and PLACED to PLAYED.&#10;Added arguments assertion (may become an exception).&#10;Added toBytes method to Message.&#10;Removed parser from Connection, added to map in Colourise.&#10;Added some packet writing.&#10;Removed colour from server side, colour will be based on identifier." />
     <MESSAGE value="Marked src as source directory (became unmarked).&#10;Moved Card.java to protocol package (required in client and server).&#10;Added fromInt method for deserialisation.&#10;Add byte casting where necessary.&#10;Replaced unused getSocketChannel() with isConnected() in Connection class.&#10;Marked fields in Server as final.&#10;Fixed lobby writes in Colourise.java.&#10;Corrected Lobby.count() return type.&#10;Marked game field as final in Match.&#10;Corrected Player.write(Message)." />
     <MESSAGE value="Removed &quot;game&quot; fields from Lobby and Match, not required.&#10;Added exceptions for Match start/finish.&#10;Added Factory class to Message class to help create messages/packets.&#10;Colourise is now alerted of game starts/ends by exceptions.&#10;Added base exception type." />
-    <option name="LAST_COMMIT_MESSAGE" value="Removed &quot;game&quot; fields from Lobby and Match, not required.&#10;Added exceptions for Match start/finish.&#10;Added Factory class to Message class to help create messages/packets.&#10;Colourise is now alerted of game starts/ends by exceptions.&#10;Added base exception type." />
+    <MESSAGE value="Corrected signature of Binder.connect&#10;Reduced coupling of Connection and Server." />
+    <option name="LAST_COMMIT_MESSAGE" value="Corrected signature of Binder.connect&#10;Reduced coupling of Connection and Server." />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/colourise/server/Player.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="23" column="26" selection-start-line="23" selection-start-column="26" selection-end-line="23" selection-end-column="26" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/server/match/Match.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2023">
-          <caret line="141" column="31" lean-forward="true" selection-start-line="141" selection-start-column="31" selection-end-line="141" selection-end-column="31" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#986#987#0" expanded="true" />
-            <element signature="e#1031#1032#0" expanded="true" />
-            <element signature="e#1127#1128#0" expanded="true" />
-            <element signature="e#1158#1159#0" expanded="true" />
-            <element signature="e#2701#2702#0" expanded="true" />
-            <element signature="e#2767#2768#0" expanded="true" />
-            <element signature="e#2812#2813#0" expanded="true" />
-            <element signature="e#2878#2879#0" expanded="true" />
-            <element signature="e#2925#2926#0" expanded="true" />
-            <element signature="e#2965#2966#0" expanded="true" />
-            <element signature="e#3018#3019#0" expanded="true" />
-            <element signature="e#3065#3066#0" expanded="true" />
-            <element signature="e#3346#3347#0" expanded="true" />
-            <element signature="e#3393#3394#0" expanded="true" />
-            <element signature="e#3713#3714#0" expanded="true" />
-            <element signature="e#3793#3794#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/Command.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="10" selection-start-line="3" selection-start-column="10" selection-end-line="3" selection-end-column="10" />
-          <folding>
-            <element signature="e#353#354#0" expanded="true" />
-            <element signature="e#392#393#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/Message.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
@@ -549,7 +533,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/server/Colourise.java">
+    <entry file="file://$PROJECT_DIR$/src/colourise/server/Service.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1054">
           <caret line="75" column="48" lean-forward="true" selection-start-line="75" selection-start-column="48" selection-end-line="75" selection-end-column="48" />
@@ -590,22 +574,12 @@
           <caret line="133" selection-start-line="133" selection-end-line="133" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#986#987#0" expanded="true" />
+            <element signature="e#915#916#0" expanded="true" />
+            <element signature="e#948#949#0" expanded="true" />
+            <element signature="e#1002#1003#0" expanded="true" />
+            <element signature="e#1032#1033#0" expanded="true" />
             <element signature="e#1031#1032#0" expanded="true" />
-            <element signature="e#1127#1128#0" expanded="true" />
-            <element signature="e#1158#1159#0" expanded="true" />
-            <element signature="e#2701#2702#0" expanded="true" />
-            <element signature="e#2767#2768#0" expanded="true" />
-            <element signature="e#2812#2813#0" expanded="true" />
-            <element signature="e#2878#2879#0" expanded="true" />
-            <element signature="e#2925#2926#0" expanded="true" />
-            <element signature="e#2965#2966#0" expanded="true" />
-            <element signature="e#3018#3019#0" expanded="true" />
-            <element signature="e#3065#3066#0" expanded="true" />
-            <element signature="e#3346#3347#0" expanded="true" />
-            <element signature="e#3393#3394#0" expanded="true" />
-            <element signature="e#3713#3714#0" expanded="true" />
-            <element signature="e#3793#3794#0" expanded="true" />
+            <element signature="e#1062#1063#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -624,7 +598,7 @@
     <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/Message.java">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/server/Colourise.java">
+    <entry file="file://$PROJECT_DIR$/src/colourise/server/Service.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="561">
           <caret line="44" column="27" selection-start-line="44" selection-start-column="27" selection-end-line="44" selection-end-column="27" />
@@ -664,7 +638,7 @@
     <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/Message.java">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/server/Colourise.java">
+    <entry file="file://$PROJECT_DIR$/src/colourise/server/Service.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="748">
           <caret line="44" column="27" selection-start-line="44" selection-start-column="27" selection-end-line="44" selection-end-column="27" />
@@ -697,7 +671,7 @@
     <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/Message.java">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/server/Colourise.java">
+    <entry file="file://$PROJECT_DIR$/src/colourise/server/Service.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="391">
           <caret line="34" column="23" lean-forward="true" selection-start-line="34" selection-start-column="23" selection-end-line="34" selection-end-column="23" />
@@ -725,34 +699,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/message/Hello.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="18" selection-start-line="2" selection-start-column="18" selection-end-line="2" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/message/Joined.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="19" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/message/Leave.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="18" selection-start-line="2" selection-start-column="18" selection-end-line="2" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/message/Left.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="17" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/message/Hello.java" />
+    <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/message/Joined.java" />
+    <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/message/Leave.java" />
+    <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/message/Left.java" />
     <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/Card.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
@@ -777,23 +727,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/server/match/MatchFinishedException.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
-          <folding>
-            <element signature="e#130#131#0" expanded="true" />
-            <element signature="e#153#154#0" expanded="true" />
-            <element signature="e#206#207#0" expanded="true" />
-            <element signature="e#236#237#0" expanded="true" />
-            <element signature="e#290#291#0" expanded="true" />
-            <element signature="e#318#319#0" expanded="true" />
-            <element signature="e#388#389#0" expanded="true" />
-            <element signature="e#425#426#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/colourise/server/lobby/MatchStartedException.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
@@ -812,16 +745,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/server/Player.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="31" selection-start-line="15" selection-start-column="31" selection-end-line="15" selection-end-column="31" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/Command.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="374">
@@ -833,46 +756,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/server/lobby/Lobby.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="12" column="26" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/server/match/Match.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="10" column="20" lean-forward="true" selection-start-line="10" selection-start-column="20" selection-end-line="10" selection-end-column="20" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#986#987#0" expanded="true" />
-            <element signature="e#1031#1032#0" expanded="true" />
-            <element signature="e#1127#1128#0" expanded="true" />
-            <element signature="e#1158#1159#0" expanded="true" />
-            <element signature="e#2701#2702#0" expanded="true" />
-            <element signature="e#2767#2768#0" expanded="true" />
-            <element signature="e#2812#2813#0" expanded="true" />
-            <element signature="e#2878#2879#0" expanded="true" />
-            <element signature="e#2925#2926#0" expanded="true" />
-            <element signature="e#2965#2966#0" expanded="true" />
-            <element signature="e#3018#3019#0" expanded="true" />
-            <element signature="e#3065#3066#0" expanded="true" />
-            <element signature="e#3346#3347#0" expanded="true" />
-            <element signature="e#3393#3394#0" expanded="true" />
-            <element signature="e#3713#3714#0" expanded="true" />
-            <element signature="e#3793#3794#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/colourise/networking/protocol/Message.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="553">
-          <caret line="52" lean-forward="true" selection-start-line="52" selection-end-line="52" />
+        <state relative-caret-position="680">
+          <caret line="52" selection-start-line="52" selection-end-line="52" />
           <folding>
             <element signature="e#1018#1019#0" expanded="true" />
             <element signature="e#1105#1106#0" expanded="true" />
@@ -887,13 +774,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/networking/Binder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/colourise/networking/Listener.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
@@ -901,10 +781,51 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/colourise/networking/NetworkingException.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="11" selection-start-line="11" selection-end-line="34" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/colourise/networking/DisconnectedException.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="18" selection-start-line="18" selection-end-line="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/colourise/networking/Server.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="578">
+          <caret line="41" column="9" selection-start-line="41" selection-start-column="9" selection-end-line="41" selection-end-column="9" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/colourise/networking/Connection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="952">
+          <caret line="60" column="51" lean-forward="true" selection-start-line="60" selection-start-column="51" selection-end-line="60" selection-end-column="51" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/colourise/server/match/MatchFinishedException.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/colourise/server/match/MatchException.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" selection-start-line="4" selection-end-line="36" />
+        <state relative-caret-position="323">
+          <caret line="19" column="5" lean-forward="true" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
           <folding>
             <element signature="e#188#189#0" expanded="true" />
             <element signature="e#216#217#0" expanded="true" />
@@ -912,60 +833,95 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/networking/NetworkingException.java">
+    <entry file="file://$PROJECT_DIR$/src/colourise/server/match/InvalidPositionException.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" selection-start-line="11" selection-end-line="34" selection-end-column="5" />
+        <state relative-caret-position="842">
+          <caret line="54" column="1" lean-forward="true" selection-start-line="4" selection-end-line="54" selection-end-column="1" />
           <folding>
-            <element signature="e#191#192#0" expanded="true" />
-            <element signature="e#219#220#0" expanded="true" />
+            <element signature="e#217#218#0" expanded="true" />
+            <element signature="e#246#247#0" expanded="true" />
+            <element signature="e#201#202#0" expanded="true" />
+            <element signature="e#225#226#0" expanded="true" />
+            <element signature="e#250#251#0" expanded="true" />
+            <element signature="e#274#275#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/networking/DisconnectedException.java">
+    <entry file="file://$PROJECT_DIR$/src/colourise/server/match/CannotPlayException.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
+        <state relative-caret-position="-59">
+          <caret line="4" column="38" selection-start-line="4" selection-start-column="38" selection-end-line="4" selection-end-column="38" />
           <folding>
-            <element signature="e#141#142#0" expanded="true" />
-            <element signature="e#164#165#0" expanded="true" />
-            <element signature="e#229#230#0" expanded="true" />
-            <element signature="e#259#260#0" expanded="true" />
-            <element signature="e#327#328#0" expanded="true" />
-            <element signature="e#355#356#0" expanded="true" />
-            <element signature="e#439#440#0" expanded="true" />
-            <element signature="e#476#477#0" expanded="true" />
+            <element signature="e#234#235#0" expanded="true" />
+            <element signature="e#263#264#0" expanded="true" />
+            <element signature="e#290#291#0" expanded="true" />
+            <element signature="e#316#317#0" expanded="true" />
+            <element signature="e#346#347#0" expanded="true" />
+            <element signature="e#375#376#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/networking/Connection.java">
+    <entry file="file://$PROJECT_DIR$/src/colourise/server/match/NotPlayersTurnException.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+          <folding>
+            <element signature="e#192#193#0" expanded="true" />
+            <element signature="e#221#222#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/colourise/networking/Binder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="19" column="37" lean-forward="true" selection-start-line="19" selection-start-column="37" selection-end-line="19" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/colourise/server/Player.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="570">
+          <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/colourise/server/lobby/Lobby.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="33" lean-forward="true" selection-start-line="3" selection-start-column="33" selection-end-line="3" selection-end-column="33" />
+          <folding>
+            <element signature="e#393#394#0" expanded="true" />
+            <element signature="e#414#415#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/colourise/server/match/Match.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="442">
+          <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#915#916#0" expanded="true" />
+            <element signature="e#948#949#0" expanded="true" />
+            <element signature="e#1002#1003#0" expanded="true" />
+            <element signature="e#1032#1033#0" expanded="true" />
+            <element signature="e#1031#1032#0" expanded="true" />
+            <element signature="e#1062#1063#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/colourise/server/Service.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="476">
-          <caret line="30" column="25" lean-forward="true" selection-start-line="30" selection-start-column="25" selection-end-line="30" selection-end-column="25" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#372#373#0" expanded="true" />
-            <element signature="e#400#401#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/networking/Server.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="41" column="9" lean-forward="true" selection-start-line="41" selection-start-column="9" selection-end-line="41" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/colourise/server/Colourise.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-399">
-          <caret line="65" column="5" lean-forward="true" selection-start-line="65" selection-start-column="5" selection-end-line="65" selection-end-column="5" />
+          <caret line="123" column="13" lean-forward="true" selection-start-line="123" selection-start-column="13" selection-end-line="123" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

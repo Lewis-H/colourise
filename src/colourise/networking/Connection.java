@@ -17,6 +17,8 @@ public class Connection {
     }
 
     public byte[] read(int maximum) throws DisconnectedException {
+        if(!sc.isConnected())
+            throw new DisconnectedException(this);
         ByteBuffer buffer = ByteBuffer.allocate(maximum);
         try {
             int received = sc.read(buffer);

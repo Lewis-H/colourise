@@ -1,6 +1,6 @@
 package colourise.server.match;
 
-public class MatchFinishedException extends MatchException {
+public final class MatchFinishedException extends MatchException {
     public MatchFinishedException(Match m) {
         super(m);
     }

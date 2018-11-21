@@ -3,8 +3,7 @@ package colourise.server;
 import colourise.networking.Connection;
 import colourise.networking.protocol.Card;
 import colourise.networking.protocol.Message;
-import colourise.server.match.Match;
-import colourise.server.match.MatchFinishedException;
+import colourise.server.match.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,7 +35,7 @@ public final class Player {
         cards.add(Card.Replacement);
     }
 
-    public void play(int row, int column, Card card) throws MatchFinishedException {
+    public void play(int row, int column, Card card) throws MatchFinishedException, NotPlayersTurnException, InvalidPositionException, CannotPlayException {
         use(card);
         match.play(row, column, this, card);
     }

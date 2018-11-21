@@ -1,9 +1,9 @@
 package colourise.server.match;
 
 import colourise.networking.Connection;
+import colourise.networking.DisconnectedException;
 import colourise.networking.protocol.Card;
 import colourise.networking.protocol.Message;
-import colourise.server.Colourise;
 import colourise.server.Player;
 
 import java.util.*;
@@ -26,11 +26,11 @@ public class Match {
     }
 
     public Map<Player, Integer> getScoreboard() {
-        return new HashMap<>(scoreboard);
+        return scoreboard;
     }
 
     public Set<Player> getPlayers() {
-        return new HashSet<>(players);
+        return players;
     }
 
     public boolean isFinished() {
@@ -49,17 +49,17 @@ public class Match {
         current = iterator.next();
     }
 
-    public void play(int row, int column, Player player, Card card) throws MatchFinishedException {
+    public void play(int row, int column, Player player, Card card) throws MatchFinishedException, NotPlayersTurnException, CannotPlayException, InvalidPositionException {
         if(player != getCurrent())
-            return; // Add exception
+            throw new NotPlayersTurnException(this, player);
         if(isFinished())
             throw new MatchFinishedException(this);
         place(row, column, player, card);
         refresh();
     }
 
-    private void place(int row, int column, Player player, Card card) {
-        if(!valid(row, column)) return; // Add exception
+    private void place(int row, int column, Player player, Card card) throws CannotPlayException, InvalidPositionException {
+        if(!valid(row, column)) throw new InvalidPositionException(this, player, row, column);
         if((card == Card.Freedom || adjacent(row, column, player)) && (card == Card.Replacement || !occupied(row, column))) {
             // If the space is occupied (i.e. the replacement card has been used) then decrement the score of the player occupying the space
             if(occupied(row, column))
@@ -69,7 +69,7 @@ public class Match {
             // Increment the player's score
             increment(player);
         }else{
-            return; // Add exception
+            throw new CannotPlayException(this, player, row, column);
         }
     }
 
@@ -159,12 +159,6 @@ public class Match {
                 } while (current != c);
             }
         }
-    }
-
-    public void write(Message m) {
-        byte[] bytes = m.toBytes();
-        for(Player p : players)
-            p.getConnection().write(bytes);
     }
 
     private void finish() throws MatchFinishedException {

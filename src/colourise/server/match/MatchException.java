@@ -2,7 +2,7 @@ package colourise.server.match;
 
 import colourise.ColouriseException;
 
-public class MatchException extends ColouriseException {
+public abstract class MatchException extends ColouriseException {
     private final Match match;
 
     public Match getMatch() {
