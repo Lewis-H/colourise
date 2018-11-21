@@ -1,6 +1,6 @@
 package colourise.server.match;
 
-import colourise.server.Player;
+import colourise.server.player.Player;
 
 public final class CannotPlayException extends MatchException {
     private final int row, column;

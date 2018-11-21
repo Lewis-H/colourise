@@ -1,6 +1,6 @@
 package colourise.server.match;
 
-import colourise.server.Player;
+import colourise.server.player.Player;
 
 public final class InvalidPositionException extends MatchException {
     private final int row, column;

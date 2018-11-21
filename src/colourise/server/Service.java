@@ -5,6 +5,8 @@ import colourise.networking.protocol.*;
 import colourise.server.lobby.Lobby;
 import colourise.server.lobby.MatchStartedException;
 import colourise.server.match.*;
+import colourise.server.player.CardAlreadyUsedException;
+import colourise.server.player.Player;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -114,7 +116,7 @@ public class Service implements Listener {
                     try {
                         p.play(m.getArgument(0), m.getArgument(1), Card.fromInt(m.getArgument(2)));
                         write(match, Message.Factory.played(p.getIdentifier(), m.getArgument(0), m.getArgument(1)));
-                    } catch(NotPlayersTurnException | InvalidPositionException | CannotPlayException ex) {
+                    } catch(NotPlayersTurnException | InvalidPositionException | CannotPlayException | CardAlreadyUsedException ex) {
                         return;
                     }
                     break;

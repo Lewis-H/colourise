@@ -1,4 +1,4 @@
-package colourise.server;
+package colourise.server.player;
 
 import colourise.networking.Connection;
 import colourise.networking.protocol.Card;
@@ -35,15 +35,15 @@ public final class Player {
         cards.add(Card.Replacement);
     }
 
-    public void play(int row, int column, Card card) throws MatchFinishedException, NotPlayersTurnException, InvalidPositionException, CannotPlayException {
+    public void play(int row, int column, Card card) throws MatchFinishedException, NotPlayersTurnException, InvalidPositionException, CannotPlayException, CardAlreadyUsedException {
         use(card);
         match.play(row, column, this, card);
     }
 
-    private void use(Card card) {
+    private void use(Card card) throws CardAlreadyUsedException {
         if(card != Card.None)
             if(!cards.remove(card))
-                return; // Add exception
+                throw new CardAlreadyUsedException(this, card);
     }
 
     public boolean has(Card card) {
