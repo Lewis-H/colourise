@@ -31,8 +31,8 @@ public class Message {
     }
 
     public static class Factory {
-        public static Message hello(boolean leader) {
-            return new Message(Command.HELLO, new byte[]{(byte) (leader ? 1 : 0)});
+        public static Message hello(boolean leader, int count) {
+            return new Message(Command.HELLO, new byte[]{ (byte) (leader ? 1 : 0), (byte) count });
         }
 
         public static Message joined(int count) {
@@ -51,12 +51,12 @@ public class Message {
             return new Message(Command.BEGIN, new byte[] { (byte) id, (byte) count });
         }
 
-        public static Message play(int x, int y, Card c) {
-            return new Message(Command.PLAY, new byte[] { (byte) x, (byte) y, (byte) c.ordinal() });
+        public static Message play(int row, int column, Card c) {
+            return new Message(Command.PLAY, new byte[] { (byte) row, (byte) column, (byte) c.ordinal() });
         }
 
-        public static Message played(int id, int x, int y) {
-            return new Message(Command.PLAYED, new byte[] { (byte) id, (byte) x, (byte) y });
+        public static Message played(int id, int row, int column) {
+            return new Message(Command.PLAYED, new byte[] { (byte) id, (byte) row, (byte) column });
         }
 
         public static Message end(int s1, int s2, int s3, int s4, int s5) {

@@ -24,8 +24,8 @@ public enum Command {
     public static int getLength(Command command) {
         switch(command) {
             case HELLO:
-                // 1 arguments: leader flag
-                return 1;
+                // 1 arguments: leader flag, count
+                return 2;
             case JOINED:
                 // 1 argument: count
                 return 1;
@@ -39,10 +39,10 @@ public enum Command {
                 // 2 arguments: identifier, player count
                 return 2;
             case PLAY:
-                // 3 arguments: x, y, card
+                // 3 arguments: row, column, card
                 return 3;
             case PLAYED:
-                // 3 arguments: identifier, x, y
+                // 3 arguments: identifier, row, column
                 return 3;
             case END:
                 // 5 arguments: scores

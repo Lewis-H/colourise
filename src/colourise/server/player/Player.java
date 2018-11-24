@@ -2,7 +2,6 @@ package colourise.server.player;
 
 import colourise.networking.Connection;
 import colourise.networking.protocol.Card;
-import colourise.networking.protocol.Message;
 import colourise.server.match.*;
 
 import java.util.HashSet;
@@ -30,9 +29,9 @@ public final class Player {
         this.connection = connection;
         this.match = match;
         this.identifier = identifier;
-        cards.add(Card.DoubleMove);
-        cards.add(Card.Freedom);
-        cards.add(Card.Replacement);
+        cards.add(Card.DOUBLE_MOVE);
+        cards.add(Card.FREEDOM);
+        cards.add(Card.REPLACEMENT);
     }
 
     public void play(int row, int column, Card card) throws MatchFinishedException, NotPlayersTurnException, InvalidPositionException, CannotPlayException, CardAlreadyUsedException {
@@ -41,7 +40,7 @@ public final class Player {
     }
 
     private void use(Card card) throws CardAlreadyUsedException {
-        if(card != Card.None)
+        if(card != Card.NONE)
             if(!cards.remove(card))
                 throw new CardAlreadyUsedException(this, card);
     }

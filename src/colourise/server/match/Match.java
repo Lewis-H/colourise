@@ -8,11 +8,11 @@ import java.util.*;
 
 public class Match {
     public static final int MAX_PLAYERS = 5;
-    private final int rows = 6,
-                      columns = 10;
+    private final int ROWS = 6,
+                      COLUMNS = 10;
     private final Set<Player> players = new HashSet<>(MAX_PLAYERS),
                               blocked = new HashSet<>(5);
-    private final Player[][] grid = new Player[rows][columns];
+    private final Player[][] grid = new Player[ROWS][COLUMNS];
     private final Map<Player, Integer> scoreboard = new HashMap<>(MAX_PLAYERS);
     private Iterator<Player> iterator;
     private Player current;
@@ -58,7 +58,7 @@ public class Match {
 
     private void place(int row, int column, Player player, Card card) throws CannotPlayException, InvalidPositionException {
         if(!valid(row, column)) throw new InvalidPositionException(this, player, row, column);
-        if((card == Card.Freedom || adjacent(row, column, player)) && (card == Card.Replacement || !occupied(row, column))) {
+        if((card == Card.FREEDOM || adjacent(row, column, player)) && (card == Card.REPLACEMENT || !occupied(row, column))) {
             // If the space is occupied (i.e. the replacement card has been used) then decrement the score of the player occupying the space
             if(occupied(row, column))
                 decrement(get(row, column));
@@ -106,16 +106,16 @@ public class Match {
     }
 
     private boolean valid(int row, int column) {
-        return row >= 0 && column >= 0 && row < rows && column < columns;
+        return row >= 0 && column >= 0 && row < ROWS && column < COLUMNS;
     }
 
     private void refresh() throws MatchFinishedException {
         // Find the blocked players
         Set<Player> free = new HashSet<>(players.size() - blocked.size());
-        for(int r = 0; r <= rows; r++) {
-            for (int c = 0; c <= columns; c++) {
+        for(int r = 0; r <= ROWS; r++) {
+            for (int c = 0; c <= COLUMNS; c++) {
                 Player player = get(r, c);
-                if((player.has(Card.Freedom) || player.has(Card.Replacement)) && !free.contains(player) && !blocked(player) && !blocked(r, c))
+                if((player.has(Card.FREEDOM) || player.has(Card.REPLACEMENT)) && !free.contains(player) && !blocked(player) && !blocked(r, c))
                     free.add(player);
             }
         }

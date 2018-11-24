@@ -40,6 +40,7 @@ public class Service implements Listener {
     public void connected(Connection c) {
         if(c == null)
             throw new IllegalArgumentException("c");
+        System.out.println("Client connected");
         parsers.put(c, new Parser());
         join(c);
     }
@@ -48,9 +49,9 @@ public class Service implements Listener {
         if(c == null)
             throw new IllegalArgumentException("c");
         try {
+            write(lobby, Message.Factory.joined(lobby.count() + 1));
             lobby.join(c);
-            write(c, Message.Factory.hello(c == lobby.getLeader()));
-            write(lobby, Message.Factory.joined(lobby.count()));
+            write(c, Message.Factory.hello(c == lobby.getLeader(), lobby.count()));
         } catch(MatchStartedException ex) {
             started(ex.getMatch());
         }
@@ -179,6 +180,7 @@ public class Service implements Listener {
                 received(player, parser(player.getConnection()).create());
                 parser(player.getConnection()).reset();
             }
+            write(player.getConnection(), Message.Factory.begin(player.getIdentifier(), match.getPlayers().size()));
         }
     }
 

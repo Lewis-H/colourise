@@ -1,10 +1,10 @@
 package colourise.networking.protocol;
 
 public enum Card {
-    None,
-    DoubleMove,
-    Replacement,
-    Freedom;
+    NONE,
+    DOUBLE_MOVE,
+    REPLACEMENT,
+    FREEDOM;
 
     private static final Card[] values = Card.values();
 
