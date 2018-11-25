@@ -1,6 +1,6 @@
 package colourise.server.lobby;
 
-import colourise.server.match.Match;
+import colourise.state.match.Match;
 
 public class MatchStartedException extends LobbyException {
     private final Match match;

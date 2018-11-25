@@ -1,4 +1,4 @@
-package colourise.server.match;
+package colourise.state.match;
 
 import colourise.ColouriseException;
 

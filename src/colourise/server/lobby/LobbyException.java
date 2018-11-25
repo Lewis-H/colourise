@@ -1,7 +1,6 @@
 package colourise.server.lobby;
 
 import colourise.ColouriseException;
-import colourise.server.match.Match;
 
 public class LobbyException extends ColouriseException {
     private final Lobby lobby;

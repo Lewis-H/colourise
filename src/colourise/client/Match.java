@@ -25,6 +25,14 @@ public final class Match {
                 players.put(i, new Player(i));
     }
 
+    public Player getOccupier(int row, int column) {
+        if(row >= ROWS)
+            throw new IllegalArgumentException("row");
+        if(column >= COLUMNS)
+            throw new IllegalArgumentException("column");
+        return grid[row][column];
+    }
+
     void update(Message m) throws MatchFinishedException, LeftMatchException {
         if(m == null)
             throw new IllegalArgumentException("m");
@@ -38,6 +46,7 @@ public final class Match {
                 int row = m.getArgument(1);
                 int column = m.getArgument(2);
                 grid[row][column] = player;
+                System.out.println(m.getArgument(0) + " played (" + m.getArgument(1) + ", " + m.getArgument(2) + ").");
                 break;
             case LEFT:
                 players.remove(Byte.valueOf(m.getArgument(0)).intValue());

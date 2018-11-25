@@ -1,8 +1,8 @@
-package colourise.server.match;
+package colourise.state.match;
 
 import colourise.networking.Connection;
 import colourise.networking.protocol.Card;
-import colourise.server.player.Player;
+import colourise.state.player.Player;
 
 import java.util.*;
 

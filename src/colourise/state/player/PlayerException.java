@@ -1,4 +1,4 @@
-package colourise.server.player;
+package colourise.state.player;
 
 import colourise.ColouriseException;
 

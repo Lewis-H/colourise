@@ -4,9 +4,8 @@ import colourise.networking.*;
 import colourise.networking.protocol.*;
 import colourise.server.lobby.Lobby;
 import colourise.server.lobby.MatchStartedException;
-import colourise.server.match.*;
-import colourise.server.player.CardAlreadyUsedException;
-import colourise.server.player.Player;
+import colourise.state.match.*;
+import colourise.state.player.CardAlreadyUsedException;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

@@ -1,8 +1,8 @@
-package colourise.server.match;
+package colourise.state.match;
 
-import colourise.server.player.Player;
+import colourise.state.player.Player;
 
-public final class CannotPlayException extends MatchException {
+public final class InvalidPositionException extends MatchException {
     private final int row, column;
     private final Player player;
 
@@ -18,35 +18,35 @@ public final class CannotPlayException extends MatchException {
         return column;
     }
 
-    public CannotPlayException(Match m, Player p, int r, int c) {
+    public InvalidPositionException(Match m, Player p, int r, int c) {
         super(m);
         player = p;
         row = r;
         column = c;
     }
 
-    public CannotPlayException(String message, Match m, Player p, int r, int c) {
+    public InvalidPositionException(String message, Match m, Player p, int r, int c) {
         super(message, m);
         player = p;
         row = r;
         column = c;
     }
 
-    public CannotPlayException(Throwable cause, Match m, Player p, int r, int c) {
+    public InvalidPositionException(Throwable cause, Match m, Player p, int r, int c) {
         super(cause, m);
         player = p;
         row = r;
         column = c;
     }
 
-    public CannotPlayException(String message, Throwable cause, Match m, Player p, int r, int c) {
+    public InvalidPositionException(String message, Throwable cause, Match m, Player p, int r, int c) {
         super(message, cause, m);
         player = p;
         row = r;
         column = c;
     }
 
-    public CannotPlayException(String message, Throwable cause, boolean enableSuppression, boolean writableStacktrace, Match m, Player p, int r, int c) {
+    public InvalidPositionException(String message, Throwable cause, boolean enableSuppression, boolean writableStacktrace, Match m, Player p, int r, int c) {
         super(message, cause, enableSuppression, writableStacktrace, m);
         player = p;
         row = r;

@@ -1,7 +1,7 @@
 package colourise.server.lobby;
 
 import colourise.networking.Connection;
-import colourise.server.match.Match;
+import colourise.state.match.Match;
 
 import java.util.HashSet;
 import java.util.Set;

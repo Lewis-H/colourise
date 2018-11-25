@@ -2,7 +2,7 @@ package colourise.client;
 
 import colourise.networking.protocol.Message;
 
-public class Colourise {
+public class Client {
     private Match match = null;
     private Lobby lobby = null;
 
@@ -24,6 +24,7 @@ public class Colourise {
                     break;
             }
         }catch(MatchBegunException ex) {
+            lobby = null;
             match = ex.getMatch();
             throw ex;
         }
@@ -46,16 +47,16 @@ public class Colourise {
     }
 
     public void update(Message m) throws MatchFinishedException, LeftMatchException, MatchBegunException {
-        if (lobby == null & match == null) {
+        if(lobby != null) {
+            updateLobby(m);
+        } else if (match != null) {
+            updateMatch(m);
+        } else {
             switch (m.getCommand()) {
                 case HELLO:
                     lobby = new Lobby(m.getArgument(0) != 0, m.getArgument(1));
                     break;
             }
-        } else if (lobby != null) {
-            updateLobby(m);
-        } else if (match != null) {
-            updateMatch(m);
         }
     }
 }

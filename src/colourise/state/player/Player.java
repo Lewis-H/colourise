@@ -1,21 +1,15 @@
-package colourise.server.player;
+package colourise.state.player;
 
-import colourise.networking.Connection;
 import colourise.networking.protocol.Card;
-import colourise.server.match.*;
+import colourise.state.match.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public final class Player {
-    private final Connection connection;
+public class Player {
     private final Match match;
     private final Set<Card> cards = new HashSet<>(3);
     private final int identifier;
-
-    public Connection getConnection() {
-        return connection;
-    }
 
     public Match getMatch() {
         return match;
@@ -25,8 +19,7 @@ public final class Player {
         return identifier;
     }
 
-    public Player(Connection connection, Match match, int identifier) {
-        this.connection = connection;
+    public Player(Match match, int identifier) {
         this.match = match;
         this.identifier = identifier;
         cards.add(Card.DOUBLE_MOVE);

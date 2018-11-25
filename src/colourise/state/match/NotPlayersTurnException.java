@@ -1,6 +1,6 @@
-package colourise.server.match;
+package colourise.state.match;
 
-import colourise.server.player.Player;
+import colourise.state.player.Player;
 
 public final class NotPlayersTurnException extends MatchException {
     private Player player;

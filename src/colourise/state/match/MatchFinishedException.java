@@ -1,4 +1,4 @@
-package colourise.server.match;
+package colourise.state.match;
 
 public final class MatchFinishedException extends MatchException {
     public MatchFinishedException(Match m) {
