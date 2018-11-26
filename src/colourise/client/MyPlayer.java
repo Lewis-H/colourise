@@ -2,15 +2,21 @@ package colourise.client;
 
 import colourise.networking.protocol.Card;
 import colourise.networking.protocol.Message;
+import colourise.state.player.Player;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class MyPlayer extends Player {
+public final class MyPlayer {
+    private final Player internal;
     private final Set<Card> cards = new HashSet<>(3);
 
-    public MyPlayer(int id) {
-        super(id);
+    public Player getInternal() {
+        return internal;
+    }
+
+    public MyPlayer(Player internal) {
+        this.internal = internal;
         cards.add(Card.FREEDOM);
         cards.add(Card.REPLACEMENT);
         cards.add(Card.DOUBLE_MOVE);

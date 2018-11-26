@@ -35,11 +35,11 @@ public class Match {
         return finished;
     }
 
-    public Match(Collection<Connection> connections) {
+    public Match(int count) {
         // This should always be the case, as enforced by the Lobby.
-        assert connections.size() <= MAX_PLAYERS;
-        for(Connection connection : connections) {
-            Player player = new Player(connection, this, 0);
+        assert count <= MAX_PLAYERS;
+        for(int i = 0; i < count; i++) {
+            Player player = new Player(this, i);
             players.add(player);
             scoreboard.put(player, 0);
         }

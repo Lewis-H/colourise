@@ -1,4 +1,4 @@
-package colourise.server.lobby;
+package colourise.state.lobby;
 
 import colourise.ColouriseException;
 

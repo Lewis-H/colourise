@@ -2,26 +2,27 @@ package colourise.server;
 
 import colourise.networking.*;
 import colourise.networking.protocol.*;
-import colourise.server.lobby.Lobby;
-import colourise.server.lobby.MatchStartedException;
+import colourise.state.lobby.Lobby;
+import colourise.state.lobby.LobbyFullException;
 import colourise.state.match.*;
 import colourise.state.player.CardAlreadyUsedException;
+import colourise.state.player.Player;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Service implements Listener {
     private final Map<Connection, Player> players = new HashMap<>();
+    private final Map<Player, Connection> connections = new HashMap<>();
     private final Map<Connection, Parser> parsers = new HashMap<>();
-    private Lobby lobby;
+    private Lobby<Connection> lobby;
     private Server server;
 
     public Service(InetSocketAddress address) throws IOException {
         if(address == null)
             throw new IllegalArgumentException("address");
-        lobby = new Lobby();
+        lobby = new Lobby<>(Match.MAX_PLAYERS);
         server = Binder.listen(address, this);
     }
 
@@ -29,10 +30,22 @@ public class Service implements Listener {
         server.listen();
     }
 
-    private Parser parser(Connection c) {
-        if(c == null)
-            throw new IllegalArgumentException("c");
-        return parsers.get(c);
+    private Parser parserOf(Connection connection) {
+        if(connection == null)
+            throw new IllegalArgumentException("connection");
+        return parsers.get(connection);
+    }
+
+    private Connection connectionOf(Player player) {
+        if(player == null)
+            throw new IllegalArgumentException("player");
+        return connections.get(player);
+    }
+
+    private Player playerOf(Connection connection) {
+        if(connection == null)
+            throw new IllegalArgumentException("connection");
+        return players.get(connection);
     }
 
     @Override
@@ -44,78 +57,81 @@ public class Service implements Listener {
         join(c);
     }
 
-    private void join(Connection c) {
-        if(c == null)
-            throw new IllegalArgumentException("c");
+    private void join(Connection connection) {
+        if(connection == null)
+            throw new IllegalArgumentException("connection");
         try {
-            write(lobby, Message.Factory.joined(lobby.count() + 1));
-            lobby.join(c);
-            write(c, Message.Factory.hello(c == lobby.getLeader(), lobby.count()));
-        } catch(MatchStartedException ex) {
-            started(ex.getMatch());
+            write(lobby, Message.Factory.joined(lobby.size() + 1));
+            lobby.join(connection);
+            if(lobby.size() == lobby.capacity())
+                throw new LobbyFullException(lobby);
+            write(connection, Message.Factory.hello(connection == lobby.getLeader(), lobby.size()));
+        } catch(LobbyFullException ex) {
+            started(lobby);
+            lobby.clear();
         }
     }
 
     @Override
-    public void disconnected(Connection c) {
-        if(c == null)
-            throw new IllegalArgumentException("c");
-        Player player = players.get(c);
+    public void disconnected(Connection connection) {
+        if(connection == null)
+            throw new IllegalArgumentException("connection");
+        Player player = playerOf(connection);
         if(player != null) { // Player is in a game.
             try {
                 player.leave();
             } catch(MatchFinishedException ex) {
                 finished(ex.getMatch());
             }
-            players.remove(c);
+            players.remove(connection);
             write(player.getMatch(), Message.Factory.left(player.getIdentifier()));
         } else { // Player is in the lobby.
-            lobby.leave(c);
-            write(lobby, Message.Factory.left(lobby.count()));
+            lobby.leave(connection);
+            write(lobby, Message.Factory.left(lobby.size()));
         }
-        parsers.remove(c);
+        parsers.remove(connection);
     }
 
     @Override
-    public void read(Connection c) {
-        if(c == null)
-            throw new IllegalArgumentException("c");
+    public void read(Connection connection) {
+        if(connection == null)
+            throw new IllegalArgumentException("connection");
         try {
-            parser(c).add(c.read(parser(c).getRemaining()));
-            if (parser(c).getRemaining() == 0) {
-                Player p = players.get(c);
+            parserOf(connection).add(connection.read(parserOf(connection).getRemaining()));
+            if (parserOf(connection).getRemaining() == 0) {
+                Player p = players.get(connection);
                 if (p != null) {
-                    received(p, parser(c).create());
-                    parser(c).reset();
+                    received(p, parserOf(connection).create());
+                    parserOf(connection).reset();
                 }
             }
         } catch(DisconnectedException ex) {
-            disconnected(c);
+            disconnected(connection);
         }
     }
 
-    private void received(Player p, Message m) {
-        if(p == null)
-            throw new IllegalArgumentException("p");
-        if(m == null)
-            throw new IllegalArgumentException("m");
+    private void received(Player player, Message message) {
+        if(player == null)
+            throw new IllegalArgumentException("player");
+        if(message == null)
+            throw new IllegalArgumentException("message");
         try {
-            Match match = p.getMatch();
-            switch(m.getCommand()) {
+            Match match = player.getMatch();
+            switch(message.getCommand()) {
                 case LEAVE:
                     // Leave the match
-                    p.leave();
+                    player.leave();
                     // Notify remaining players
-                    write(match, Message.Factory.left(p.getIdentifier()));
+                    write(match, Message.Factory.left(player.getIdentifier()));
                     // Remove player object
-                    players.remove(p.getConnection());
+                    players.remove(connectionOf(player));
                     // Join lobby
-                    join(p.getConnection());
+                    join(connectionOf(player));
                     break;
                 case PLAY:
                     try {
-                        p.play(m.getArgument(0), m.getArgument(1), Card.fromInt(m.getArgument(2)));
-                        write(match, Message.Factory.played(p.getIdentifier(), m.getArgument(0), m.getArgument(1)));
+                        player.play(message.getArgument(0), message.getArgument(1), Card.fromInt(message.getArgument(2)));
+                        write(match, Message.Factory.played(player.getIdentifier(), message.getArgument(0), message.getArgument(1)));
                     } catch(NotPlayersTurnException | InvalidPositionException | CannotPlayException | CardAlreadyUsedException ex) {
                         return;
                     }
@@ -129,57 +145,63 @@ public class Service implements Listener {
         }
     }
 
-    private int write(Connection c, byte[] b) {
-        if(c == null)
-            throw new IllegalArgumentException("c");
-        if(b == null)
-            throw new IllegalArgumentException("b");
+    private int write(Connection connection, byte[] bytes) {
+        if(connection == null)
+            throw new IllegalArgumentException("connection");
+        if(bytes == null)
+            throw new IllegalArgumentException("bytes");
         try {
-            return c.write(b);
+            return connection.write(bytes);
         }catch(DisconnectedException ex) {
-            disconnected(c);
+            disconnected(connection);
             return 0;
         }
     }
 
-    private int write(Connection c, Message m) {
-        if(c == null)
-            throw new IllegalArgumentException("c");
-        if(m == null)
-            throw new IllegalArgumentException("m");
-        return write(c, m.toBytes());
+    private int write(Connection connection, Message message) {
+        if(connection == null)
+            throw new IllegalArgumentException("connection");
+        if(message == null)
+            throw new IllegalArgumentException("message");
+        return write(connection, message.toBytes());
     }
 
-    private void write(Lobby l, Message m) {
-        if(l == null)
-            throw new IllegalArgumentException("l");
-        if(m == null)
-            throw new IllegalArgumentException("m");
-        byte[] bytes = m.toBytes();
-        for(Connection c : l.getConnections())
-            write(c, bytes);
+    private void write(Lobby<Connection> lobby, Message message) {
+        if(lobby == null)
+            throw new IllegalArgumentException("lobby");
+        if(message == null)
+            throw new IllegalArgumentException("message");
+        byte[] bytes = message.toBytes();
+        for(Connection connection : lobby.getWaiters())
+            write(connection, bytes);
     }
 
-    private void write(Match match, Message m) {
+    private void write(Match match, Message message) {
         if(match == null)
             throw new IllegalArgumentException("match");
-        if(m == null)
-            throw new IllegalArgumentException("m");
-        byte[] bytes = m.toBytes();
-        for(Player p : match.getPlayers())
-            write(p.getConnection(), bytes);
+        if(message == null)
+            throw new IllegalArgumentException("message");
+        byte[] bytes = message.toBytes();
+        for(Player player : match.getPlayers())
+            write(connectionOf(player), bytes);
     }
 
-    public void started(Match match) {
-        if(match == null)
-            throw new IllegalArgumentException("match");
-        for(Player player : match.getPlayers()) {
-            players.put(player.getConnection(), player);
-            if(parser(player.getConnection()).getRemaining() == 0) {
-                received(player, parser(player.getConnection()).create());
-                parser(player.getConnection()).reset();
+    public void started(Lobby<Connection> lobby) {
+        if(lobby == null)
+            throw new IllegalArgumentException("connections");
+        Match match = new Match(connections.size());
+        Iterator<Player> i1 = match.getPlayers().iterator();
+        Iterator<Connection> i2 = lobby.getWaiters().iterator();
+        while(i1.hasNext() && i2.hasNext()) {
+            Player player = i1.next();
+            Connection connection = i2.next();
+            players.put(connection, player);
+            connections.put(player, connection);
+            if(parserOf(connection).getRemaining() == 0) {
+                received(player, parserOf(connection).create());
+                parserOf(connection).reset();
             }
-            write(player.getConnection(), Message.Factory.begin(player.getIdentifier(), match.getPlayers().size()));
+            write(connection, Message.Factory.begin(player.getIdentifier(), match.getPlayers().size()));
         }
     }
 
@@ -192,6 +214,6 @@ public class Service implements Listener {
             scores[i++] = s;
         write(match, Message.Factory.end(scores[0], scores[1], scores[2], scores[3], scores[4]));
         for(Player player : match.getPlayers())
-            players.remove(player.getConnection());
+            players.remove(connectionOf(player));
     }
 }
