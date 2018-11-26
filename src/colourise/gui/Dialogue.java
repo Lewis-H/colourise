@@ -1,12 +1,16 @@
 package colourise.gui;
 
+import colourise.client.Game;
 import colourise.networking.Binder;
 import colourise.networking.Connection;
+import colourise.networking.protocol.Message;
+import colourise.networking.protocol.Parser;
 
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.text.NumberFormat;
@@ -23,7 +27,15 @@ public final class Dialogue extends JFrame {
     private final JPanel split = new JPanel(new BorderLayout());
     private final JButton button = new JButton("Submit");
 
-    public Dialogue() {
+    public String getHost() {
+        return hostField.getText();
+    }
+
+    public int getPort() {
+        return Integer.parseInt(portField.getText());
+    }
+
+    public Dialogue(ActionListener buttonClick) {
         super("Connect");
         portField = new JFormattedTextField(initNumberFormatter());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -41,7 +53,7 @@ public final class Dialogue extends JFrame {
         labels.add(portLabel);
         portField.setColumns(15);
         fields.add(portField);
-        button.addActionListener(this::buttonClick);
+        button.addActionListener(buttonClick);
         bottom.add(button);
         pack();
         setResizable(false);
@@ -55,16 +67,5 @@ public final class Dialogue extends JFrame {
         formatter.setMaximum(65535);
         formatter.setAllowsInvalid(false);
         return formatter;
-    }
-
-    private void buttonClick(ActionEvent e) {
-        String host = hostField.getText();
-        int port = Integer.parseInt(portField.getText());
-        try {
-            Connection connection = Binder.connect(new InetSocketAddress(host, port));
-            System.out.println("Connected!");
-        } catch (IOException ex) {
-
-        }
     }
 }

@@ -76,6 +76,7 @@ public class Service implements Listener {
     public void disconnected(Connection connection) {
         if(connection == null)
             throw new IllegalArgumentException("connection");
+        System.out.println("Client disconnected");
         Player player = playerOf(connection);
         if(player != null) { // Player is in a game.
             try {
@@ -107,6 +108,9 @@ public class Service implements Listener {
             }
         } catch(DisconnectedException ex) {
             disconnected(connection);
+        } catch(ArrayIndexOutOfBoundsException ex) {
+            connection.disconnect();
+            disconnected(connection);
         }
     }
 
@@ -130,9 +134,11 @@ public class Service implements Listener {
                     break;
                 case PLAY:
                     try {
-                        player.play(message.getArgument(0), message.getArgument(1), Card.fromInt(message.getArgument(2)));
-                        write(match, Message.Factory.played(player.getIdentifier(), message.getArgument(0), message.getArgument(1)));
+                        Card card = Card.fromInt(message.getArgument(2));
+                        player.play(message.getArgument(0), message.getArgument(1), card);
+                        write(match, Message.Factory.played(player.getIdentifier(), message.getArgument(0), message.getArgument(1), card));
                     } catch(NotPlayersTurnException | InvalidPositionException | CannotPlayException | CardAlreadyUsedException ex) {
+                        ex.printStackTrace();
                         return;
                     }
                     break;
@@ -140,7 +146,7 @@ public class Service implements Listener {
                     // Unrecognised command
                     return;
             }
-        } catch (MatchFinishedException ex) {
+        } catch(MatchFinishedException ex) {
             finished(ex.getMatch());
         }
     }

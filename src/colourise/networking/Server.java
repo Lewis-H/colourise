@@ -37,6 +37,7 @@ public final class Server {
                     } else if((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
                         read((Connection) key.attachment());
                     }
+                    it.remove();
                 }
             }
         }

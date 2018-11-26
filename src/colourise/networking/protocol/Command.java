@@ -42,8 +42,8 @@ public enum Command {
                 // 3 arguments: row, column, card
                 return 3;
             case PLAYED:
-                // 3 arguments: identifier, row, column
-                return 3;
+                // 4 arguments: identifier, row, column, card
+                return 4;
             case END:
                 // 5 arguments: scores
                 return 5;

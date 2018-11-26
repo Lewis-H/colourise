@@ -16,7 +16,6 @@ public class Parser {
     }
 
     public boolean add(byte b) {
-        if(count == arguments.length) return true; // Add exception
         if(command == null) {
             command = Command.fromInt(b);
             arguments = new byte[Command.getLength(command)];

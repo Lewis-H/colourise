@@ -3,12 +3,12 @@ package colourise.gui;
 import javax.swing.*;
 import java.awt.*;
 
-public class Game extends JFrame {
+public class Board extends JFrame {
     private ColouredGrid grid = new ColouredGrid(50);
     private PlayerList list = new PlayerList(25, 0, 5);
     private JPanel panel = new JPanel();
 
-    public Game() {
+    public Board() {
         super("Client");
         panel.add(grid, BorderLayout.WEST);
         panel.add(list, BorderLayout.EAST);
@@ -16,8 +16,9 @@ public class Game extends JFrame {
     }
 
     public static void main(String[] args) {
-        Game game = new Game();
+        Board game = new Board();
         game.setVisible(true);
+        game.setResizable(false);
         game.pack();
     }
 }

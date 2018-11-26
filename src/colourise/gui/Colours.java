@@ -1,7 +1,5 @@
 package colourise.gui;
 
-import colourise.client.Player;
-
 import java.awt.*;
 
 public class Colours {

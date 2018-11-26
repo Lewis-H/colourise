@@ -22,20 +22,22 @@ public class Connection {
         ByteBuffer buffer = ByteBuffer.allocate(maximum);
         try {
             int received = sc.read(buffer);
-            if(received == 0 && maximum != 0) {
+            if(received == -1) {
                 disconnect();
             } else if (received < maximum) {
+                System.out.println(received);
                 return Arrays.copyOf(buffer.array(), received);
             } else {
                 return buffer.array();
             }
         } catch(IOException e) {
             disconnect();
+            throw new DisconnectedException(this);
         }
         return new byte[0];
     }
 
-    public void disconnect() throws DisconnectedException {
+    public void disconnect() {
         if(sc.isConnected()) {
             try {
                 sc.shutdownInput();
@@ -54,7 +56,6 @@ public class Connection {
                 }
             }
         }
-        throw new DisconnectedException(this);
     }
 
     public int write(byte[] bytes) throws DisconnectedException {
@@ -66,7 +67,7 @@ public class Connection {
             return wrote;
         } catch (IOException e) {
             disconnect();
-            return 0;
+            throw new DisconnectedException(this);
         }
     }
 }

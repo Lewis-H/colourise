@@ -55,8 +55,8 @@ public class Message {
             return new Message(Command.PLAY, new byte[] { (byte) row, (byte) column, (byte) c.ordinal() });
         }
 
-        public static Message played(int id, int row, int column) {
-            return new Message(Command.PLAYED, new byte[] { (byte) id, (byte) row, (byte) column });
+        public static Message played(int id, int row, int column, Card card) {
+            return new Message(Command.PLAYED, new byte[] { (byte) id, (byte) row, (byte) column,(byte) card.ordinal() });
         }
 
         public static Message end(int s1, int s2, int s3, int s4, int s5) {
