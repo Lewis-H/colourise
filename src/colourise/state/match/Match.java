@@ -11,7 +11,8 @@ public class Match {
     private final int ROWS = 6,
                       COLUMNS = 10;
     private final Set<Player> players = new HashSet<>(MAX_PLAYERS),
-                              blocked = new HashSet<>(5);
+                              blocked = new HashSet<>(MAX_PLAYERS);
+    private final Set<Start> starts = new HashSet<>(MAX_PLAYERS);
     private final Player[][] grid = new Player[ROWS][COLUMNS];
     private final Map<Player, Integer> scoreboard = new HashMap<>(MAX_PLAYERS);
     private Iterator<Player> iterator;
@@ -31,20 +32,32 @@ public class Match {
         return players;
     }
 
+    public Set<Start> getStarts() {
+        return starts;
+    }
+
     public boolean isFinished() {
         return finished;
     }
 
     public Match(int count) {
         // This should always be the case, as enforced by the Lobby.
-        assert count <= MAX_PLAYERS;
+        assert count <= MAX_PLAYERS && count > 0;
+        Random random = new Random();
         for(int i = 0; i < count; i++) {
             Player player = new Player(this, i);
             players.add(player);
             scoreboard.put(player, 0);
+            int row = 0;
+            int column = 0;
+            do {
+                row = random.nextInt(ROWS);
+                column = random.nextInt(COLUMNS);
+            } while(occupied(row, column));
+            grid[row][column] = player;
+            starts.add(new Start(player, row, column));
         }
-        iterator = players.iterator();
-        current = iterator.next();
+        current = players.iterator().next();
     }
 
     public void play(int row, int column, Player player, Card card) throws MatchFinishedException, NotPlayersTurnException, CannotPlayException, InvalidPositionException {
@@ -115,8 +128,9 @@ public class Match {
         for(int r = 0; r <= ROWS; r++) {
             for (int c = 0; c <= COLUMNS; c++) {
                 Player player = get(r, c);
-                if((player.has(Card.FREEDOM) || player.has(Card.REPLACEMENT)) && !free.contains(player) && !blocked(player) && !blocked(r, c))
-                    free.add(player);
+                if(player != null)
+                    if((player.has(Card.FREEDOM) || player.has(Card.REPLACEMENT)) && !free.contains(player) && !blocked(player) && !blocked(r, c))
+                        free.add(player);
             }
         }
         for(Player player : players) {
@@ -129,33 +143,27 @@ public class Match {
         next();
     }
 
-    private void next() {
-        while(true) {
-            if(!iterator.hasNext()) iterator = players.iterator();
-            Player player = iterator.next();
-            if(!blocked(player)) {
-                current = player;
-                break;
-            }
-        }
+    private void next() throws MatchFinishedException {
+        if(players.size() == blocked.size()) finish();
+        Player previous = null;
+        Player find = current;
+        current = null;
+        while(current == null)
+            for(Player player : getPlayers())
+                if(!blocked(player))
+                    if(previous == find)
+                        current = player;
+                    else
+                        previous = player;
     }
 
     public void leave(Player player) throws MatchFinishedException {
         players.remove(player);
         blocked.remove(player);
-        if(players.size() - blocked.size() == 0) {
+        if(players.size() == blocked.size()) {
             finish();
-        } else {
-            if(current == player) {
-                iterator.remove();
-                next();
-            } else {
-                iterator = players.iterator();
-                Player c = current;
-                do {
-                    this.current = iterator.next();
-                } while (current != c);
-            }
+        } else if(current == player) {
+            next();
         }
     }
 

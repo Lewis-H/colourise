@@ -10,7 +10,7 @@ public enum Command {
     PLAY,
     PLAYED,
     END,
-    DISCONNECTED;
+    ERROR;
 
     // Expensive operation, cached here
     private static final Command[] values = Command.values();
@@ -35,8 +35,8 @@ public enum Command {
                 // No arguments, player is leaving
                 return 0;
             case LEFT:
-                // 1 argument: identifier/count (match/lobby)
-                return 1;
+                // 2 argument: identifier/count (match/lobby), next
+                return 2;
             case START:
                 return 0;
             case BEGIN:
@@ -46,11 +46,14 @@ public enum Command {
                 // 3 arguments: row, column, card
                 return 3;
             case PLAYED:
-                // 4 arguments: identifier, row, column, card
-                return 4;
+                // 5 arguments: identifier, row, column, card, next
+                return 5;
             case END:
                 // 5 arguments: scores
                 return 5;
+            case ERROR:
+                // 1 argument: error
+                return 1;
             default:
                 return 0;
         }

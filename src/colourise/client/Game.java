@@ -48,6 +48,7 @@ public class Game {
                 break;
             case JOINED:
                 lobby = m.getArgument(0);
+                break;
             case LEFT:
                 if (match == null)
                     lobby++;
@@ -60,6 +61,7 @@ public class Game {
                         }
                     }
                 }
+                break;
             case BEGIN:
                 stage = Stage.MATCH;
                 match = new Match(m.getArgument(1));

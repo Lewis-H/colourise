@@ -43,8 +43,8 @@ public class Message {
             return new Message(Command.LEAVE, new byte[0]);
         }
 
-        public static Message left(int a) {
-            return new Message(Command.LEFT, new byte[] { (byte) a });
+        public static Message left(int a, int next) {
+            return new Message(Command.LEFT, new byte[] { (byte) a, (byte) next });
         }
 
         public static Message begin(int id, int count) {
@@ -55,8 +55,8 @@ public class Message {
             return new Message(Command.PLAY, new byte[] { (byte) row, (byte) column, (byte) c.ordinal() });
         }
 
-        public static Message played(int id, int row, int column, Card card) {
-            return new Message(Command.PLAYED, new byte[] { (byte) id, (byte) row, (byte) column,(byte) card.ordinal() });
+        public static Message played(int id, int row, int column, Card card, int next) {
+            return new Message(Command.PLAYED, new byte[] { (byte) id, (byte) row, (byte) column, (byte) card.ordinal(), (byte) next });
         }
 
         public static Message end(int s1, int s2, int s3, int s4, int s5) {
@@ -66,5 +66,7 @@ public class Message {
         public static Message start() {
             return new Message(Command.START, new byte[0]);
         }
+
+        public static Message error(Error error) { return new Message(Command.ERROR, new byte[] { error.toByte() }); }
     }
 }

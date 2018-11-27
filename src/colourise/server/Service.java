@@ -2,11 +2,13 @@ package colourise.server;
 
 import colourise.networking.*;
 import colourise.networking.protocol.*;
+import colourise.networking.protocol.Error;
 import colourise.state.lobby.Lobby;
 import colourise.state.lobby.LobbyFullException;
 import colourise.state.match.*;
 import colourise.state.player.CardAlreadyUsedException;
 import colourise.state.player.Player;
+import colourise.synchronisation.Consumer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -80,17 +82,24 @@ public class Service implements Listener {
         Player player = playerOf(connection);
         if(player != null) { // Player is in a game.
             try {
-                player.leave();
+                left(connection, player);
             } catch(MatchFinishedException ex) {
                 finished(ex.getMatch());
             }
-            players.remove(connection);
-            write(player.getMatch(), Message.Factory.left(player.getIdentifier()));
         } else { // Player is in the lobby.
             lobby.leave(connection);
-            write(lobby, Message.Factory.left(lobby.size()));
+            write(lobby, Message.Factory.left(lobby.size(), 0));
         }
         parsers.remove(connection);
+    }
+
+    private void left(Connection connection, Player player) throws MatchFinishedException {
+        // Remove player object
+        players.remove(connection);
+        // Notify remaining players
+        write(player.getMatch(), Message.Factory.left(player.getIdentifier(), player.getMatch().getCurrent().getIdentifier()));
+        // Leave the match
+        player.leave();
     }
 
     @Override
@@ -101,10 +110,11 @@ public class Service implements Listener {
             parserOf(connection).add(connection.read(parserOf(connection).getRemaining()));
             if (parserOf(connection).getRemaining() == 0) {
                 Player p = players.get(connection);
-                if (p != null) {
+                if (p != null)
                     received(p, parserOf(connection).create());
-                    parserOf(connection).reset();
-                }
+                else
+                    received(connection, parserOf(connection).create());
+                parserOf(connection).reset();
             }
         } catch(DisconnectedException ex) {
             disconnected(connection);
@@ -114,32 +124,42 @@ public class Service implements Listener {
         }
     }
 
+    private void received(Connection connection, Message message) {
+        switch(message.getCommand()) {
+            case START:
+                if(connection == lobby.getLeader())
+                    started(lobby);
+                break;
+        }
+    }
+
     private void received(Player player, Message message) {
         if(player == null)
             throw new IllegalArgumentException("player");
         if(message == null)
             throw new IllegalArgumentException("message");
+        Connection connection = connectionOf(player);
         try {
             Match match = player.getMatch();
             switch(message.getCommand()) {
                 case LEAVE:
-                    // Leave the match
-                    player.leave();
-                    // Notify remaining players
-                    write(match, Message.Factory.left(player.getIdentifier()));
-                    // Remove player object
-                    players.remove(connectionOf(player));
                     // Join lobby
-                    join(connectionOf(player));
+                    join(connection);
+                    left(connection, player);
                     break;
                 case PLAY:
                     try {
                         Card card = Card.fromInt(message.getArgument(2));
                         player.play(message.getArgument(0), message.getArgument(1), card);
-                        write(match, Message.Factory.played(player.getIdentifier(), message.getArgument(0), message.getArgument(1), card));
-                    } catch(NotPlayersTurnException | InvalidPositionException | CannotPlayException | CardAlreadyUsedException ex) {
-                        ex.printStackTrace();
-                        return;
+                        write(match, Message.Factory.played(player.getIdentifier(), message.getArgument(0), message.getArgument(1), card, match.getCurrent().getIdentifier()));
+                    } catch (NotPlayersTurnException ex) {
+                        write(connection, Message.Factory.error(Error.NOT_PLAYERS_TURN));
+                    } catch (InvalidPositionException ex) {
+                        write(connection, Message.Factory.error(Error.INVALID_POSITION));
+                    } catch (CannotPlayException ex) {
+                        write(connection, Message.Factory.error(Error.CANNOT_PLAY));
+                    }catch(CardAlreadyUsedException ex) {
+                        write(connection, Message.Factory.error(Error.CARD_ALREADY_USED));
                     }
                     break;
                 default:
@@ -195,19 +215,21 @@ public class Service implements Listener {
     public void started(Lobby<Connection> lobby) {
         if(lobby == null)
             throw new IllegalArgumentException("connections");
-        Match match = new Match(connections.size());
+        Match match = new Match(lobby.size());
         Iterator<Player> i1 = match.getPlayers().iterator();
         Iterator<Connection> i2 = lobby.getWaiters().iterator();
+        Message[] starts = new Message[match.getStarts().size()];
+        int i = 0;
+        for(Start start : match.getStarts())
+            starts[i++] = Message.Factory.played(start.getPlayer().getIdentifier(), start.getRow(), start.getColumn(), Card.NONE, match.getCurrent().getIdentifier());
         while(i1.hasNext() && i2.hasNext()) {
             Player player = i1.next();
             Connection connection = i2.next();
             players.put(connection, player);
             connections.put(player, connection);
-            if(parserOf(connection).getRemaining() == 0) {
-                received(player, parserOf(connection).create());
-                parserOf(connection).reset();
-            }
             write(connection, Message.Factory.begin(player.getIdentifier(), match.getPlayers().size()));
+            for(Message start : starts)
+                write(connection, start);
         }
     }
 

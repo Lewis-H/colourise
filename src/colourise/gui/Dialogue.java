@@ -74,9 +74,8 @@ public final class Dialogue extends JFrame {
     private void clicked(ActionEvent e) {
         try {
             Connection connection = Binder.connect(new InetSocketAddress(getHost(), getPort()));
+            new Thread(new Controller(connection)).start();
             setVisible(false);
-            Controller controller = new Controller(connection);
-            new Thread(controller).run();
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage());
         }
