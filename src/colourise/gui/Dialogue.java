@@ -75,22 +75,10 @@ public final class Dialogue extends JFrame {
         try {
             Connection connection = Binder.connect(new InetSocketAddress(getHost(), getPort()));
             setVisible(false);
-            Game game = new Game();
-            try {
-                while (game.getStage() != Stage.LOBBY)
-                    game.update(read(connection));
-                lobby = new Lobby(game.isLeader());
-                for(int i = 0; i < game.size(); i++)
-                    lobby.increment();
-                lobby.pack();
-                lobby.setSize(300, 200);
-                lobby.setLocationRelativeTo(null);
-                lobby.setVisible(true);
-            } catch(DisconnectedException ex) {
-                JOptionPane.showMessageDialog(dialogue, "Host unexpectedly closed connection.");
-            }
+            Controller controller = new Controller(connection);
+            new Thread(controller).run();
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(dialogue, ex.getMessage());
+            JOptionPane.showMessageDialog(this, ex.getMessage());
         }
     }
 }
