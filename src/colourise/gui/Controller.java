@@ -1,61 +1,66 @@
 package colourise.gui;
 
-import colourise.client.Game;
-import colourise.client.Stage;
-import colourise.networking.Binder;
+import colourise.client.*;
 import colourise.networking.Connection;
 import colourise.networking.DisconnectedException;
+import colourise.networking.protocol.Command;
 import colourise.networking.protocol.Message;
 import colourise.networking.protocol.Parser;
+import colourise.synchronisation.Consumer;
+import colourise.synchronisation.Producer;
+import colourise.synchronisation.RunnableConsumer;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-
-public class Controller {
-    private Dialogue dialogue = new Dialogue(this::connectClicked);
+public class Controller extends RunnableConsumer<Message> {
     private Lobby lobby;
     private Connection connection;
-    private Game game;
+    private Reader reader;
+    private Game game = new Game();
     private Parser parser;
 
-    private void connectClicked(ActionEvent e) {
-        String host = dialogue.getHost();
-        int port = dialogue.getPort();
-        try {
-            connection = Binder.connect(new InetSocketAddress(host, port));
-            dialogue.setVisible(false);
-            game = new Game();
-            parser = new Parser();
-            try {
-                while (game.getStage() != Stage.LOBBY)
-                    game.update(read(connection));
-                lobby = new Lobby(game.isLeader());
-                for(int i = 0; i < game.size(); i++)
-                    lobby.increment();
-                lobby.pack();
-                lobby.setSize(300, 200);
-                lobby.setLocationRelativeTo(null);
-                lobby.setVisible(true);
-            } catch(DisconnectedException ex) {
-                JOptionPane.showMessageDialog(dialogue, "Host unexpectedly closed connection.");
+    public Controller(Connection connection) {
+        reader = new Reader(connection);
+        new Thread(reader).run();
+        reader.request(this);
+        this.connection = connection;
+    }
+
+    private int write(Message message) throws DisconnectedException {
+        byte[] bytes = message.toBytes();
+        return connection.write(bytes);
+    }
+
+    @Override
+    protected void consumed(Producer<Message> sender, Message message) {
+        if(sender == reader) {
+            if (message.getCommand() == Command.DISCONNECTED) {
+                reader.stop(this);
+            } else {
+                game.update(message);
+                switch (message.getCommand()) {
+                    case HELLO:
+                        lobby = new Lobby(game.isLeader(), game.size());
+                        lobby.setLocationRelativeTo(null);
+                        lobby.setVisible(true);
+                }
+                reader.request(this);
             }
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(dialogue, ex.getMessage());
+        } else {
+            try {
+                write(message);
+            } catch(DisconnectedException ex) {
+                reader.stop(this);
+            }
         }
     }
 
-    public void start() {
-        dialogue.setLocationRelativeTo(null);
-        dialogue.setVisible(true);
+    @Override
+    protected void stopped(Producer<Message> by) {
+        reader.stop(this);
     }
 
-    public Message read(Connection connection) throws DisconnectedException {
-        while (parser.getRemaining() != 0)
-            parser.add(connection.read(parser.getRemaining()));
-        Message message = parser.create();
-        parser.reset();
-        return message;
+    @Override
+    protected void interrupted() {
+        // Should never happen
+        assert false;
     }
 }

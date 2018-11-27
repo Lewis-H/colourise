@@ -5,10 +5,12 @@ public enum Command {
     JOINED,
     LEAVE,
     LEFT,
+    START,
     BEGIN,
     PLAY,
     PLAYED,
-    END;
+    END,
+    DISCONNECTED;
 
     // Expensive operation, cached here
     private static final Command[] values = Command.values();
@@ -35,6 +37,8 @@ public enum Command {
             case LEFT:
                 // 1 argument: identifier/count (match/lobby)
                 return 1;
+            case START:
+                return 0;
             case BEGIN:
                 // 2 arguments: identifier, player count
                 return 2;

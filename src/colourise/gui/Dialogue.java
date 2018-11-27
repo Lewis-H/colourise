@@ -1,8 +1,10 @@
 package colourise.gui;
 
 import colourise.client.Game;
+import colourise.client.Stage;
 import colourise.networking.Binder;
 import colourise.networking.Connection;
+import colourise.networking.DisconnectedException;
 import colourise.networking.protocol.Message;
 import colourise.networking.protocol.Parser;
 
@@ -35,7 +37,7 @@ public final class Dialogue extends JFrame {
         return Integer.parseInt(portField.getText());
     }
 
-    public Dialogue(ActionListener buttonClick) {
+    public Dialogue() {
         super("Connect");
         portField = new JFormattedTextField(initNumberFormatter());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -53,7 +55,7 @@ public final class Dialogue extends JFrame {
         labels.add(portLabel);
         portField.setColumns(15);
         fields.add(portField);
-        button.addActionListener(buttonClick);
+        button.addActionListener(this::clicked);
         bottom.add(button);
         pack();
         setResizable(false);
@@ -67,5 +69,28 @@ public final class Dialogue extends JFrame {
         formatter.setMaximum(65535);
         formatter.setAllowsInvalid(false);
         return formatter;
+    }
+
+    private void clicked(ActionEvent e) {
+        try {
+            Connection connection = Binder.connect(new InetSocketAddress(getHost(), getPort()));
+            setVisible(false);
+            Game game = new Game();
+            try {
+                while (game.getStage() != Stage.LOBBY)
+                    game.update(read(connection));
+                lobby = new Lobby(game.isLeader());
+                for(int i = 0; i < game.size(); i++)
+                    lobby.increment();
+                lobby.pack();
+                lobby.setSize(300, 200);
+                lobby.setLocationRelativeTo(null);
+                lobby.setVisible(true);
+            } catch(DisconnectedException ex) {
+                JOptionPane.showMessageDialog(dialogue, "Host unexpectedly closed connection.");
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(dialogue, ex.getMessage());
+        }
     }
 }

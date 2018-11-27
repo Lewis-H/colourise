@@ -62,5 +62,9 @@ public class Message {
         public static Message end(int s1, int s2, int s3, int s4, int s5) {
             return new Message(Command.END, new byte[] { (byte) s1, (byte) s2, (byte) s3, (byte) s4, (byte) s5 });
         }
+
+        public static Message start() {
+            return new Message(Command.START, new byte[0]);
+        }
     }
 }
