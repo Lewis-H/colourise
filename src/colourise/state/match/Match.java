@@ -10,25 +10,24 @@ public class Match {
     public static final int MAX_PLAYERS = 5;
     private final int ROWS = 6,
                       COLUMNS = 10;
-    private final Set<Player> players = new HashSet<>(MAX_PLAYERS),
-                              blocked = new HashSet<>(MAX_PLAYERS);
+    private final List<Player> players = new ArrayList<>(MAX_PLAYERS);
+    private final HashSet<Player> blocked = new HashSet<>(MAX_PLAYERS);
     private final Set<Start> starts = new HashSet<>(MAX_PLAYERS);
     private final Player[][] grid = new Player[ROWS][COLUMNS];
     private final Map<Player, Integer> scoreboard = new HashMap<>(MAX_PLAYERS);
-    private Iterator<Player> iterator;
-    private Player current;
+    private int current = 0;
     private Player winner;
     private boolean finished = false;
 
     public Player getCurrent() {
-        return current;
+        return players.get(current);
     }
 
     public Map<Player, Integer> getScoreboard() {
         return scoreboard;
     }
 
-    public Set<Player> getPlayers() {
+    public List<Player> getPlayers() {
         return players;
     }
 
@@ -57,7 +56,6 @@ public class Match {
             grid[row][column] = player;
             starts.add(new Start(player, row, column));
         }
-        current = players.iterator().next();
     }
 
     public void play(int row, int column, Player player, Card card) throws MatchFinishedException, NotPlayersTurnException, CannotPlayException, InvalidPositionException {
@@ -101,9 +99,9 @@ public class Match {
     }
 
     private boolean blocked(int row, int column) {
-        for(int r = row - 1; r <= row + 1; r++)
-            for(int c = column - 1; c <= column + 1; c++)
-                if(!occupied(r, c)) return false;
+        for(int r = row - 1; r < row + 1; r++)
+            for(int c = column - 1; c < column + 1; c++)
+                if(valid(r, c) && !occupied(r, c)) return false;
         return true;
     }
 
@@ -125,8 +123,8 @@ public class Match {
     private void refresh() throws MatchFinishedException {
         // Find the blocked players
         Set<Player> free = new HashSet<>(players.size() - blocked.size());
-        for(int r = 0; r <= ROWS; r++) {
-            for (int c = 0; c <= COLUMNS; c++) {
+        for(int r = 0; r < ROWS; r++) {
+            for (int c = 0; c < COLUMNS; c++) {
                 Player player = get(r, c);
                 if(player != null)
                     if((player.has(Card.FREEDOM) || player.has(Card.REPLACEMENT)) && !free.contains(player) && !blocked(player) && !blocked(r, c))
@@ -145,16 +143,13 @@ public class Match {
 
     private void next() throws MatchFinishedException {
         if(players.size() == blocked.size()) finish();
-        Player previous = null;
-        Player find = current;
-        current = null;
-        while(current == null)
-            for(Player player : getPlayers())
-                if(!blocked(player))
-                    if(previous == find)
-                        current = player;
-                    else
-                        previous = player;
+        for(int t = current + 1; t <= players.size() + current; t++) {
+            int i = t % players.size();
+            if(!blocked.contains(players.get(i))) {
+                current = i;
+                break;
+            }
+        }
     }
 
     public void leave(Player player) throws MatchFinishedException {
@@ -162,7 +157,7 @@ public class Match {
         blocked.remove(player);
         if(players.size() == blocked.size()) {
             finish();
-        } else if(current == player) {
+        } else if(getCurrent() == player) {
             next();
         }
     }

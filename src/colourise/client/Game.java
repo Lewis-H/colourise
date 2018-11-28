@@ -65,9 +65,7 @@ public class Game {
             case BEGIN:
                 stage = Stage.MATCH;
                 match = new Match(m.getArgument(1));
-                Iterator<Player> it = match.getPlayers().iterator();
-                while(it.hasNext()) {
-                    Player player = it.next();
+                for(Player player : match.getPlayers()) {
                     if(player.getIdentifier() == m.getArgument(0)) {
                         me = new MyPlayer(player);
                         break;

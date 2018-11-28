@@ -119,6 +119,7 @@ public class Service implements Listener {
         } catch(DisconnectedException ex) {
             disconnected(connection);
         } catch(ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
             connection.disconnect();
             disconnected(connection);
         }

@@ -1,6 +1,5 @@
 package colourise.gui;
 
-import colourise.networking.protocol.Message;
 import colourise.synchronisation.Consumer;
 import colourise.synchronisation.Producer;
 

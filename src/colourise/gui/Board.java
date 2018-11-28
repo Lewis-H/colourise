@@ -23,11 +23,11 @@ public class Board extends ProducerConsumerFrame<Message> {
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            int column = Math.round(e.getX() / grid.getScale()) - 1;
             int row = Math.round(e.getY() / grid.getScale()) - 1;
+            int column = Math.round(e.getX() / grid.getScale()) - 1;
             try {
                 System.out.println("row: " + row + ", column:" + column);
-                getRequest().push(self, Message.Factory.play(row, row, Card.NONE));
+                getRequest().push(self, Message.Factory.play(row, column, Card.NONE));
             }catch(InterruptedException ex) {
             }
         }
