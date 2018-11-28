@@ -31,8 +31,12 @@ public class Message {
     }
 
     public static class Factory {
-        public static Message hello(boolean leader, int count) {
-            return new Message(Command.HELLO, new byte[]{ (byte) (leader ? 1 : 0), (byte) count });
+        public static Message hello(int count) {
+            return new Message(Command.HELLO, new byte[]{ (byte) count });
+        }
+
+        public static Message lead() {
+            return new Message(Command.LEAD, new byte[0]);
         }
 
         public static Message joined(int count) {

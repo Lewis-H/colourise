@@ -36,7 +36,7 @@ public class Controller extends RunnableConsumer<Message> {
         if(sender == reader) {
             switch (message.getCommand()) {
                 case HELLO:
-                    lobby = new Lobby(message.getArgument(0) != 0, message.getArgument(1));
+                    lobby = new Lobby(message.getArgument(0));
                     lobby.request(this);
                     lobby.setLocationRelativeTo(null);
                     lobby.setVisible(true);

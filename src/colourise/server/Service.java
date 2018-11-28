@@ -67,8 +67,13 @@ public class Service implements Listener {
             lobby.join(connection);
             if(lobby.size() == lobby.capacity())
                 throw new LobbyFullException(lobby);
-            write(connection, Message.Factory.hello(connection == lobby.getLeader(), lobby.size()));
+            write(connection, Message.Factory.hello(lobby.size()));
+            if(lobby.getLeader() == connection)
+                write(connection, Message.Factory.lead());
         } catch(LobbyFullException ex) {
+            write(connection, Message.Factory.hello(lobby.size()));
+            if(lobby.getLeader() == connection)
+                write(connection, Message.Factory.lead());
             started(lobby);
             lobby.clear();
         }
@@ -89,6 +94,8 @@ public class Service implements Listener {
         } else { // Player is in the lobby.
             lobby.leave(connection);
             write(lobby, Message.Factory.left(lobby.size(), 0));
+            if(lobby.getLeader() != null)
+                write(lobby.getLeader(), Message.Factory.lead());
         }
         parsers.remove(connection);
     }
@@ -140,17 +147,21 @@ public class Service implements Listener {
         if(message == null)
             throw new IllegalArgumentException("message");
         Connection connection = connectionOf(player);
-        try {
             Match match = player.getMatch();
             switch(message.getCommand()) {
                 case LEAVE:
-                    // Join lobby
-                    join(connection);
-                    left(connection, player);
+                    try {
+                        // Join lobby
+                        join(connection);
+                        left(connection, player);
+                    } catch(MatchFinishedException ex) {
+                        finished(ex.getMatch());
+                    }
                     break;
                 case PLAY:
+                    Card card = Card.fromInt(message.getArgument(2));
                     try {
-                        Card card = Card.fromInt(message.getArgument(2));
+
                         player.play(message.getArgument(0), message.getArgument(1), card);
                         write(match, Message.Factory.played(player.getIdentifier(), message.getArgument(0), message.getArgument(1), card, match.getCurrent().getIdentifier()));
                     } catch (NotPlayersTurnException ex) {
@@ -161,15 +172,15 @@ public class Service implements Listener {
                         write(connection, Message.Factory.error(Error.CANNOT_PLAY));
                     }catch(CardAlreadyUsedException ex) {
                         write(connection, Message.Factory.error(Error.CARD_ALREADY_USED));
+                    } catch(MatchFinishedException ex) {
+                        write(match, Message.Factory.played(player.getIdentifier(), message.getArgument(0), message.getArgument(1), card, match.getCurrent().getIdentifier()));
+                        finished(ex.getMatch());
                     }
                     break;
                 default:
                     // Unrecognised command
                     return;
             }
-        } catch(MatchFinishedException ex) {
-            finished(ex.getMatch());
-        }
     }
 
     private int write(Connection connection, byte[] bytes) {

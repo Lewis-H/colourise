@@ -10,6 +10,10 @@ public class PlayerList extends JComponent {
     private int scale;
     private final int id;
 
+    public int count() {
+        return players.size();
+    }
+
     public void setScale(int scale) {
         this.scale = scale;
         Dimension dimension = new Dimension(scale * 3, scale * 2 * 5);

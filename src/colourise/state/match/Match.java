@@ -64,7 +64,7 @@ public class Match {
         if(isFinished())
             throw new MatchFinishedException(this);
         place(row, column, player, card);
-        refresh();
+        refresh(card == Card.DOUBLE_MOVE);
     }
 
     private void place(int row, int column, Player player, Card card) throws CannotPlayException, InvalidPositionException {
@@ -99,8 +99,8 @@ public class Match {
     }
 
     private boolean blocked(int row, int column) {
-        for(int r = row - 1; r < row + 1; r++)
-            for(int c = column - 1; c < column + 1; c++)
+        for(int r = row - 1; r <= row + 1; r++)
+            for(int c = column - 1; c <= column + 1; c++)
                 if(valid(r, c) && !occupied(r, c)) return false;
         return true;
     }
@@ -120,7 +120,7 @@ public class Match {
         return row >= 0 && column >= 0 && row < ROWS && column < COLUMNS;
     }
 
-    private void refresh() throws MatchFinishedException {
+    private void refresh(boolean skip) throws MatchFinishedException {
         // Find the blocked players
         Set<Player> free = new HashSet<>(players.size() - blocked.size());
         for(int r = 0; r < ROWS; r++) {
@@ -138,7 +138,9 @@ public class Match {
         // Set the next (free) player
         if(free.isEmpty())
             finish();
-        next();
+        // Skips selecting next player for double move, only if player is not blocked (to avoid halting the entire game).
+        if(!skip || blocked.contains(getCurrent()))
+            next();
     }
 
     private void next() throws MatchFinishedException {
@@ -153,12 +155,15 @@ public class Match {
     }
 
     public void leave(Player player) throws MatchFinishedException {
+        Player current = getCurrent();
         players.remove(player);
         blocked.remove(player);
         if(players.size() == blocked.size()) {
             finish();
         } else if(getCurrent() == player) {
             next();
+        } else {
+            this.current = players.indexOf(current);
         }
     }
 

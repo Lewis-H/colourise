@@ -12,7 +12,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Lobby extends ProducerConsumerFrame<Message> {
     private final JLabel message = new JLabel("Waiting for players...");
-    private final boolean leader;
+    private boolean leader;
+    private int players;
     private final JLabel count;
     private final JLabel capacity = new JLabel("/5");
     private final JPanel panel = new JPanel(new GridLayout(3, 1));
@@ -21,10 +22,10 @@ public class Lobby extends ProducerConsumerFrame<Message> {
     private final JPanel middle = new JPanel(new BorderLayout());
     private final JPanel bottom = new JPanel();
 
-    public Lobby(boolean leader, int players) {
+    public Lobby(int players) {
         setTitle("Lobby");
-        this.leader = leader;
-        count = new JLabel("0");
+        leader = false;
+        count = new JLabel("1");
         count.setFont(new Font(count.getFont().getName(), count.getFont().getStyle(), 30));
         setPlayers(players);
         button.addActionListener(this::clicked);
@@ -42,14 +43,21 @@ public class Lobby extends ProducerConsumerFrame<Message> {
         setResizable(false);
     }
 
+    public void setLeader(boolean leader) {
+        this.leader = leader;
+        if(leader && players >= 2)
+            button.setEnabled(true);
+    }
+
     private void setPlayers(int players) {
+        this.players = players;
         count.setText(Integer.toString(players));
         if(leader && players >= 2)
             button.setEnabled(true);
     }
 
     public static void main(String[] args) {
-        Lobby lobby = new Lobby(false, 0);
+        Lobby lobby = new Lobby( 0);
     }
 
     public void clicked(ActionEvent e) {
@@ -72,6 +80,9 @@ public class Lobby extends ProducerConsumerFrame<Message> {
                 break;
             case BEGIN:
                 setVisible(false);
+                break;
+            case LEAD:
+                setLeader(true);
                 break;
         }
     }
