@@ -8,7 +8,6 @@ import colourise.state.lobby.LobbyFullException;
 import colourise.state.match.*;
 import colourise.state.player.CardAlreadyUsedException;
 import colourise.state.player.Player;
-import colourise.synchronisation.Consumer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -18,8 +17,9 @@ public class Service implements Listener {
     private final Map<Connection, Player> players = new HashMap<>();
     private final Map<Player, Connection> connections = new HashMap<>();
     private final Map<Connection, Parser> parsers = new HashMap<>();
-    private Lobby<Connection> lobby;
-    private Server server;
+    private final Lobby<Connection> lobby;
+    private final Server server;
+    private final Set<Connection> disconnected = new HashSet<>();
 
     public Service(InetSocketAddress address) throws IOException {
         if(address == null)
@@ -51,12 +51,12 @@ public class Service implements Listener {
     }
 
     @Override
-    public void connected(Connection c) {
-        if(c == null)
-            throw new IllegalArgumentException("c");
+    public void connected(Connection connection) {
+        if(connection == null)
+            throw new IllegalArgumentException("connection");
         System.out.println("Client connected");
-        parsers.put(c, new Parser());
-        join(c);
+        parsers.put(connection, new Parser());
+        join(connection);
     }
 
     private void join(Connection connection) {
@@ -103,10 +103,10 @@ public class Service implements Listener {
     private void left(Connection connection, Player player) throws MatchFinishedException {
         // Remove player object
         players.remove(connection);
-        // Notify remaining players
-        write(player.getMatch(), Message.Factory.left(player.getIdentifier(), player.getMatch().getCurrent().getIdentifier()));
         // Leave the match
         player.leave();
+        // Notify remaining players
+        write(player.getMatch(), Message.Factory.left(player.getIdentifier(), player.getMatch().getCurrent().getIdentifier()));
     }
 
     @Override
@@ -122,6 +122,8 @@ public class Service implements Listener {
                 else
                     received(connection, parserOf(connection).create());
                 parserOf(connection).reset();
+                for(Connection disconnect : disconnected)
+                    disconnected(disconnect);
             }
         } catch(DisconnectedException ex) {
             disconnected(connection);
@@ -147,40 +149,31 @@ public class Service implements Listener {
         if(message == null)
             throw new IllegalArgumentException("message");
         Connection connection = connectionOf(player);
-            Match match = player.getMatch();
-            switch(message.getCommand()) {
-                case LEAVE:
-                    try {
-                        // Join lobby
-                        join(connection);
-                        left(connection, player);
-                    } catch(MatchFinishedException ex) {
-                        finished(ex.getMatch());
-                    }
-                    break;
-                case PLAY:
-                    Card card = Card.fromInt(message.getArgument(2));
-                    try {
+        Match match = player.getMatch();
+        switch(message.getCommand()) {
+            case PLAY:
+                Card card = Card.fromInt(message.getArgument(2));
+                try {
 
-                        player.play(message.getArgument(0), message.getArgument(1), card);
-                        write(match, Message.Factory.played(player.getIdentifier(), message.getArgument(0), message.getArgument(1), card, match.getCurrent().getIdentifier()));
-                    } catch (NotPlayersTurnException ex) {
-                        write(connection, Message.Factory.error(Error.NOT_PLAYERS_TURN));
-                    } catch (InvalidPositionException ex) {
-                        write(connection, Message.Factory.error(Error.INVALID_POSITION));
-                    } catch (CannotPlayException ex) {
-                        write(connection, Message.Factory.error(Error.CANNOT_PLAY));
-                    }catch(CardAlreadyUsedException ex) {
-                        write(connection, Message.Factory.error(Error.CARD_ALREADY_USED));
-                    } catch(MatchFinishedException ex) {
-                        write(match, Message.Factory.played(player.getIdentifier(), message.getArgument(0), message.getArgument(1), card, match.getCurrent().getIdentifier()));
-                        finished(ex.getMatch());
-                    }
-                    break;
-                default:
-                    // Unrecognised command
-                    return;
-            }
+                    player.play(message.getArgument(0), message.getArgument(1), card);
+                    write(match, Message.Factory.played(player.getIdentifier(), message.getArgument(0), message.getArgument(1), card, match.getCurrent().getIdentifier()));
+                } catch (NotPlayersTurnException ex) {
+                    write(connection, Message.Factory.error(Error.NOT_PLAYERS_TURN));
+                } catch (InvalidPositionException ex) {
+                    write(connection, Message.Factory.error(Error.INVALID_POSITION));
+                } catch (CannotPlayException ex) {
+                    write(connection, Message.Factory.error(Error.CANNOT_PLAY));
+                }catch(CardAlreadyUsedException ex) {
+                    write(connection, Message.Factory.error(Error.CARD_ALREADY_USED));
+                } catch(MatchFinishedException ex) {
+                    write(match, Message.Factory.played(player.getIdentifier(), message.getArgument(0), message.getArgument(1), card, match.getCurrent().getIdentifier()));
+                    finished(ex.getMatch());
+                }
+                break;
+            default:
+                // Unrecognised command
+                return;
+        }
     }
 
     private int write(Connection connection, byte[] bytes) {
@@ -191,7 +184,7 @@ public class Service implements Listener {
         try {
             return connection.write(bytes);
         }catch(DisconnectedException ex) {
-            disconnected(connection);
+            disconnected.add(ex.getConnection());
             return 0;
         }
     }
@@ -249,11 +242,13 @@ public class Service implements Listener {
         if(match == null)
             throw new IllegalArgumentException("match");
         int[] scores = new int[5];
-        int i = 0;
-        for(Integer s : match.getScoreboard().values())
-            scores[i++] = s;
+        for(Map.Entry<Player, Integer> score : match.getScoreboard().entrySet())
+            scores[score.getKey().getIdentifier()] = score.getValue();
         write(match, Message.Factory.end(scores[0], scores[1], scores[2], scores[3], scores[4]));
-        for(Player player : match.getPlayers())
-            players.remove(connectionOf(player));
+        for(Player player : match.getPlayers()) {
+            Connection connection = connectionOf(player);
+            players.remove(connection);
+            connection.disconnect();
+        }
     }
 }

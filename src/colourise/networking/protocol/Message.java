@@ -43,10 +43,6 @@ public class Message {
             return new Message(Command.JOINED, new byte[] { (byte) count });
         }
 
-        public static Message leave() {
-            return new Message(Command.LEAVE, new byte[0]);
-        }
-
         public static Message left(int a, int next) {
             return new Message(Command.LEFT, new byte[] { (byte) a, (byte) next });
         }

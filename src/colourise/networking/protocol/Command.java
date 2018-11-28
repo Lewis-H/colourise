@@ -4,7 +4,6 @@ public enum Command {
     HELLO,
     LEAD,
     JOINED,
-    LEAVE,
     LEFT,
     START,
     BEGIN,
@@ -34,9 +33,6 @@ public enum Command {
             case JOINED:
                 // 1 argument: count
                 return 1;
-            case LEAVE:
-                // No arguments, player is leaving
-                return 0;
             case LEFT:
                 // 2 argument: identifier/count (match/lobby), next
                 return 2;
