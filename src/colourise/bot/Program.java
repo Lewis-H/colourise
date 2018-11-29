@@ -5,6 +5,7 @@ import colourise.state.match.CannotPlayException;
 import colourise.state.match.InvalidPositionException;
 import colourise.state.match.MatchFinishedException;
 import colourise.state.match.NotPlayersTurnException;
+import colourise.state.player.CardAlreadyUsedException;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -26,7 +27,7 @@ public class Program {
             System.out.println("The server said goodbye. Goodbye!");
         } catch(MatchFinishedException ex) {
             System.out.println("Game over!");
-        } catch(NotPlayersTurnException | CannotPlayException | InvalidPositionException ex) {
+        } catch(NotPlayersTurnException | CannotPlayException | InvalidPositionException | CardAlreadyUsedException ex) {
             System.err.println("Uh oh...");
             ex.printStackTrace();
         } catch(IOException ex) {

@@ -9,6 +9,7 @@ import colourise.state.lobby.LobbyFullException;
 import colourise.state.match.*;
 import colourise.state.player.CardAlreadyUsedException;
 import colourise.state.player.Player;
+import javafx.geometry.Pos;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -125,6 +126,7 @@ public class Service implements Listener {
                 parserOf(connection).reset();
                 for(Connection disconnect : disconnected)
                     disconnected(disconnect);
+                disconnected.clear();
             }
         } catch(DisconnectedException ex) {
             disconnected(connection);
@@ -224,32 +226,31 @@ public class Service implements Listener {
         Match match = new Match(lobby.size());
         Iterator<Player> i1 = match.getPlayers().iterator();
         Iterator<Connection> i2 = lobby.getWaiters().iterator();
+        int[] rows = new int[5];
+        int[] columns = new int[5];
+        for(Map.Entry<Integer, Position> start : match.getStarts().entrySet()) {
+            rows[start.getKey()] = start.getValue().getRow();
+            columns[start.getKey()] = start.getValue().getColumn();
+        }
         while(i1.hasNext() && i2.hasNext()) {
             Player player = i1.next();
             Connection connection = i2.next();
             players.put(connection, player);
             connections.put(player, connection);
-            write(connection, Message.Factory.begin(player.getIdentifier(), match.getPlayers().size()));
-        }
-        Random random = new Random();
-        try {
-            for (int i = 0; i < match.getPlayers().size(); i++) {
-                Player player = match.getCurrent();
-                int row = 0;
-                int column = 0;
-                do {
-                    row = random.nextInt(match.getRows());
-                    column = random.nextInt(match.getColumns());
-                } while (match.occupied(row, column));
-                match.play(row, column, player, Card.NONE);
-                write(match, Message.Factory.played(player.getIdentifier(), row, column, Card.NONE, i == match.getPlayers().size() - 1 ? 0 : match.getPlayers().size()));
-            }
-        } catch(ColouriseException ex) {
-            ex.printStackTrace();
-            for(Player player : match.getPlayers()) {
-                connectionOf(player).disconnect();
-                disconnected(connectionOf(player));
-            }
+            write(connection, Message.Factory.begin(
+                    player.getIdentifier(),
+                    match.getPlayers().size(),
+                    rows[0],
+                    columns[0],
+                    rows[1],
+                    columns[1],
+                    rows[2],
+                    columns[2],
+                    rows[3],
+                    columns[3],
+                    rows[4],
+                    columns[4]
+            ));
         }
     }
 

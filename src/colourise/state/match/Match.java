@@ -10,24 +10,29 @@ public class Match {
     public static final int MAX_PLAYERS = 5;
     private final int ROWS = 6,
                       COLUMNS = 10;
-    private final List<Player> players = new ArrayList<>(MAX_PLAYERS);
-    private final HashSet<Player> blocked = new HashSet<>(MAX_PLAYERS);
+    private final Map<Integer, Player> players = new HashMap<>(MAX_PLAYERS);
+    private final Set<Player> blocked = new HashSet<>(MAX_PLAYERS);
     private final Map<Integer, Position> starts;
     private final Player[][] grid = new Player[ROWS][COLUMNS];
     private final Map<Player, Integer> scoreboard = new HashMap<>(MAX_PLAYERS);
     private int current = 0;
+    private int filled = 0;
     private boolean finished = false;
 
+    public boolean isFull() {
+        return ROWS * COLUMNS == filled;
+    }
+
     public Player getCurrent() {
-        return players.size() == 0 ? null : players.get(current);
+        return players.get(current);
     }
 
     public Map<Player, Integer> getScoreboard() {
         return scoreboard;
     }
 
-    public List<Player> getPlayers() {
-        return players;
+    public Collection<Player> getPlayers() {
+        return players.values();
     }
 
     public Map<Integer, Position> getStarts() {
@@ -62,7 +67,7 @@ public class Match {
         }
         for(Map.Entry<Integer, Position> start : starts.entrySet()) {
             Player player = new Player(this, start.getKey());
-            players.add(player);
+            players.put(player.getIdentifier(), player);
             scoreboard.put(player, 0);
             grid[start.getValue().getRow()][start.getValue().getColumn()] = player;
         }
@@ -72,7 +77,7 @@ public class Match {
     public Match(Map<Integer, Position> starts) {
         for(Map.Entry<Integer, Position> start : starts.entrySet()) {
             Player player = new Player(this, start.getKey());
-            players.add(player);
+            players.put(player.getIdentifier(), player);
             scoreboard.put(player, 0);
             grid[start.getValue().getRow()][start.getValue().getColumn()] = player;
         }
@@ -94,6 +99,8 @@ public class Match {
             // If the space is occupied (i.e. the replacement card has been used) then decrement the score of the player occupying the space
             if(occupied(row, column))
                 decrement(get(row, column));
+            else
+                ++filled;
             // Place the player in the grid position
             grid[row][column] = player;
             // Increment the player's score
@@ -130,7 +137,7 @@ public class Match {
         return blocked.contains(player);
     }
 
-    private boolean adjacent(int row, int column, Player player) {
+    public boolean adjacent(int row, int column, Player player) {
         for(int r = row - 1; r <= row + 1; r++)
             for(int c = column - 1; c <= column + 1; c++)
                 if(valid(r, c) && get(r, c) == player) return true;
@@ -148,11 +155,11 @@ public class Match {
             for (int column = 0; column < COLUMNS; column++) {
                 Player player = get(row, column);
                 if(player != null && !free.contains(player) && !blocked(player))
-                    if((player.has(Card.FREEDOM) || player.has(Card.REPLACEMENT)) || !blocked(row, column))
+                    if(((player.has(Card.FREEDOM) && !isFull()) || player.has(Card.REPLACEMENT)) || !blocked(row, column))
                         free.add(player);
             }
         }
-        for(Player player : players) {
+        for(Player player : players.values()) {
             if(!free.contains(player) && !blocked(player))
                 blocked.add(player);
         }
@@ -176,15 +183,13 @@ public class Match {
     }
 
     public void leave(Player player) throws MatchFinishedException {
-        Player current = getCurrent();
         players.remove(player);
         blocked.remove(player);
+        Player c = getCurrent();
         if(players.size() == blocked.size() || players.size() == 0) {
             finish();
         } else if(getCurrent() == player) {
             next();
-        } else {
-            this.current = players.indexOf(current);
         }
     }
 

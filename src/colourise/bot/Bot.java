@@ -8,7 +8,9 @@ import colourise.networking.protocol.Card;
 import colourise.networking.protocol.Message;
 import colourise.networking.protocol.Parser;
 import colourise.state.match.*;
+import colourise.state.player.CardAlreadyUsedException;
 import colourise.state.player.Player;
+import javafx.geometry.Pos;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -28,7 +30,7 @@ public class Bot {
         connection = Binder.connect(new InetSocketAddress(host, port));
     }
 
-    public void start() throws MatchFinishedException, NotPlayersTurnException, CannotPlayException, InvalidPositionException, DisconnectedException {
+    public void start() throws CardAlreadyUsedException, MatchFinishedException, NotPlayersTurnException, CannotPlayException, InvalidPositionException, DisconnectedException {
         while(true) {
             while (parser.getRemaining() != 0)
                 parser.add(connection.read(parser.getRemaining()));
@@ -37,7 +39,8 @@ public class Bot {
         }
     }
 
-    private void process(Message message) throws MatchFinishedException, NotPlayersTurnException, CannotPlayException, InvalidPositionException, DisconnectedException {
+    private void process(Message message) throws CardAlreadyUsedException, MatchFinishedException, NotPlayersTurnException, CannotPlayException, InvalidPositionException, DisconnectedException {
+        System.out.println(message.getCommand());
         if(lobby == 0 && match == null) {
             switch(message.getCommand()) {
                 case HELLO:
@@ -59,13 +62,18 @@ public class Bot {
                     lobby = 0;
                     int id = message.getArgument(0);
                     int count = message.getArgument(1);
-                    match = new Match(count);
+                    Map<Integer, Position> starts = new HashMap<>(count);
+                    for(int i = 0; i < count; i++)
+                        starts.put(i, new Position(message.getArgument(2 + 2 * i), message.getArgument(3 + 2 * i)));
+                    match = new Match(starts);
                     for(Player player : match.getPlayers()) {
                         if(player.getIdentifier() == id) {
                             me = new MyPlayer(player);
                             break;
                         }
                     }
+                    if(id == 0)
+                        play();
                     break;
             }
         } else if(match != null) {
@@ -79,8 +87,8 @@ public class Bot {
                     Card card = Card.fromInt(message.getArgument(3));
                     next = message.getArgument(4);
                     for(Player player : match.getPlayers())
-                        if(player.getIdentifier() == id)
-                            match.play(row, column, player, card);
+                        if (player.getIdentifier() == id)
+                            player.play(row, column, card);
                     if(next == me.getInternal().getIdentifier())
                         play();
                     break;
@@ -97,16 +105,28 @@ public class Bot {
         }
     }
 
-    private void play() throws MatchFinishedException, NotPlayersTurnException, CannotPlayException, InvalidPositionException, DisconnectedException {
+    private void play() throws DisconnectedException {
         try {
             TimeUnit.SECONDS.sleep(1);
         } catch(InterruptedException ex) {
         } finally {
-            List<Position> positions = scan();
+            List<Position> positions = null;
+            Card card = Card.NONE;
+            if(me.getInternal().has(Card.FREEDOM)) {
+                positions = scanFreedom();
+                card = Card.FREEDOM;
+            }
+            if(me.getInternal().has(Card.REPLACEMENT) && (positions == null || positions.size() == 0)) {
+                positions = scanReplacement();
+                card = Card.REPLACEMENT;
+            }
+            if(positions == null || positions.size() == 0) {
+                positions = scan();
+                card = Card.NONE;
+            }
             Random random = new Random();
             Position position = positions.get(random.nextInt(positions.size()));
-            match.play(position.getRow(), position.getColumn(), me.getInternal(), Card.NONE);
-            write(Message.Factory.play(position.getRow(), position.getColumn(), Card.NONE));
+            write(Message.Factory.play(position.getRow(), position.getColumn(), card));
         }
     }
 
@@ -114,12 +134,29 @@ public class Bot {
         return connection.write(m.toBytes());
     }
 
+    private List<Position> scanFreedom() {
+        List<Position> positions = new ArrayList<>();
+        for(int row = 0; row < match.getRows(); row++)
+            for(int column = 0; column < match.getColumns(); column++)
+                positions.add(new Position(row, column));
+        return positions;
+    }
+
+    private List<Position> scanReplacement() {
+        List<Position> positions = new ArrayList<>();
+        for(Position position : scan())
+            for(int row = position.getRow() - 1; row <= position.getRow() + 1; row += 2)
+                for(int column = position.getColumn() - 1; column <= position.getColumn() + 1; column += 2)
+                    if(match.valid(row, column) && match.get(row, column) != me.getInternal())
+                        positions.add(new Position(row, column));
+        return positions;
+    }
+
     private List<Position> scan() {
         List<Position> positions = new ArrayList<>();
         for(int row = 0; row < match.getRows(); row++)
             for(int column = 0; column < match.getColumns(); column++)
-                if(match.get(row, column) == me.getInternal())
-                    if(!match.blocked(row, column))
+                if(!match.occupied(row, column) && match.adjacent(row, column, me.getInternal()))
                         positions.add(new Position(row, column));
         assert positions.size() > 0;
         return positions;
