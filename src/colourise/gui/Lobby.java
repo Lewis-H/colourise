@@ -18,7 +18,7 @@ public class Lobby extends ProducerConsumerFrame<Message> {
     private final JLabel capacity = new JLabel("/5");
     private final JPanel panel = new JPanel(new GridLayout(3, 1));
     private final JPanel top = new JPanel(new FlowLayout());
-    private final JButton button = new JButton("Position");
+    private final JButton button = new JButton("Start");
     private final JPanel middle = new JPanel(new BorderLayout());
     private final JPanel bottom = new JPanel();
 
