@@ -2,13 +2,16 @@ package colourise.gui;
 
 import colourise.networking.protocol.Card;
 import colourise.networking.protocol.Message;
+import colourise.state.match.Position;
 import colourise.synchronisation.Producer;
+import javafx.geometry.Pos;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Board extends ProducerConsumerFrame<Message> {
     private final ColouredGrid grid = new ColouredGrid(50);
@@ -41,21 +44,18 @@ public class Board extends ProducerConsumerFrame<Message> {
         public void mouseExited(MouseEvent e) {}
     };
 
-    public Board(int scale, int id, int count) {
+    public Board(int scale, int id, int count, Map<Integer, Position> positions) {
         setTitle("Board");
         identifier = id;
         list = new PlayerList(scale, id, count);
         grid.addMouseListener(play);
+        for(Map.Entry<Integer, Position> position : positions.entrySet())
+            grid.setColour(position.getValue().getRow(), position.getValue().getColumn(), Colours.getColour(position.getKey()));
         panel.add(grid, BorderLayout.WEST);
         panel.add(list, BorderLayout.EAST);
         add(panel);
         pack();
         setResizable(false);
-    }
-
-    public static void main(String[] args) {
-        Board game = new Board(25, 0, 5);
-        game.setVisible(true);
     }
 
     @Override

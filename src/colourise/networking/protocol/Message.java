@@ -51,8 +51,8 @@ public class Message {
             return new Message(Command.LEFT, new byte[] { (byte) a, (byte) next });
         }
 
-        public static Message begin(int id, int count) {
-            return new Message(Command.BEGIN, new byte[] { (byte) id, (byte) count });
+        public static Message begin(int id, int count, int r0, int c0, int r1, int c1, int r2, int c2, int r3, int c3, int r4, int c4) {
+            return new Message(Command.BEGIN, new byte[] { (byte) id, (byte) count, (byte) r0, (byte) c0, (byte) r1, (byte) c1, (byte) r2, (byte) c2, (byte) r3, (byte) c3, (byte) r4, (byte) c4 });
         }
 
         public static Message play(int row, int column, Card c) {

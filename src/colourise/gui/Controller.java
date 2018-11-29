@@ -7,9 +7,13 @@ import colourise.networking.protocol.Command;
 import colourise.networking.protocol.Error;
 import colourise.networking.protocol.Message;
 import colourise.networking.protocol.Parser;
+import colourise.state.match.Position;
 import colourise.synchronisation.Consumer;
 import colourise.synchronisation.Producer;
 import colourise.synchronisation.RunnableConsumer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Controller extends RunnableConsumer<Message> {
     private Lobby lobby;
@@ -44,7 +48,11 @@ public class Controller extends RunnableConsumer<Message> {
                     break;
                 case BEGIN:
                     lobby.push(sender, message);
-                    board = new Board(25, message.getArgument(0), message.getArgument(1));
+                    int count = message.getArgument(1);
+                    Map<Integer, Position> positions = new HashMap<Integer, Position>(count);
+                    for(int i = 0; i < count; i++)
+                        positions.put(i, new Position(message.getArgument(2 + 2 * i), message.getArgument(3 + 2 * i)));
+                    board = new Board(25, message.getArgument(0), message.getArgument(1), positions);
                     board.request(this);
                     board.setVisible(true);
                     forward = board;

@@ -1,8 +1,8 @@
 package colourise.state.match;
 
-import colourise.networking.Connection;
 import colourise.networking.protocol.Card;
 import colourise.state.player.Player;
+import javafx.geometry.Pos;
 
 import java.util.*;
 
@@ -12,11 +12,10 @@ public class Match {
                       COLUMNS = 10;
     private final List<Player> players = new ArrayList<>(MAX_PLAYERS);
     private final HashSet<Player> blocked = new HashSet<>(MAX_PLAYERS);
-    private final Set<Start> starts = new HashSet<>(MAX_PLAYERS);
+    private final Map<Integer, Position> starts;
     private final Player[][] grid = new Player[ROWS][COLUMNS];
     private final Map<Player, Integer> scoreboard = new HashMap<>(MAX_PLAYERS);
     private int current = 0;
-    private Player winner;
     private boolean finished = false;
 
     public Player getCurrent() {
@@ -31,7 +30,7 @@ public class Match {
         return players;
     }
 
-    public Set<Start> getStarts() {
+    public Map<Integer, Position> getStarts() {
         return starts;
     }
 
@@ -39,23 +38,45 @@ public class Match {
         return finished;
     }
 
+    public int getRows() {
+        return ROWS;
+    }
+
+    public int getColumns() {
+        return COLUMNS;
+    }
+
     public Match(int count) {
         // This should always be the case, as enforced by the Lobby.
         assert count <= MAX_PLAYERS && count > 0;
         Random random = new Random();
+        Map<Integer, Position> starts = new HashMap<>();
         for(int i = 0; i < count; i++) {
-            Player player = new Player(this, i);
-            players.add(player);
-            scoreboard.put(player, 0);
-            int row = 0;
-            int column = 0;
+            int row;
+            int column;
             do {
                 row = random.nextInt(ROWS);
                 column = random.nextInt(COLUMNS);
             } while(occupied(row, column));
-            grid[row][column] = player;
-            starts.add(new Start(player, row, column));
+            starts.put(i, new Position(row, column));
         }
+        for(Map.Entry<Integer, Position> start : starts.entrySet()) {
+            Player player = new Player(this, start.getKey());
+            players.add(player);
+            scoreboard.put(player, 0);
+            grid[start.getValue().getRow()][start.getValue().getColumn()] = player;
+        }
+        this.starts = starts;
+    }
+
+    public Match(Map<Integer, Position> starts) {
+        for(Map.Entry<Integer, Position> start : starts.entrySet()) {
+            Player player = new Player(this, start.getKey());
+            players.add(player);
+            scoreboard.put(player, 0);
+            grid[start.getValue().getRow()][start.getValue().getColumn()] = player;
+        }
+        this.starts = starts;
     }
 
     public void play(int row, int column, Player player, Card card) throws MatchFinishedException, NotPlayersTurnException, CannotPlayException, InvalidPositionException {
@@ -90,15 +111,15 @@ public class Match {
         scoreboard.put(player, scoreboard.get(player) - 1);
     }
 
-    private Player get(int row, int column) {
+    public Player get(int row, int column) {
         return grid[row][column];
     }
 
-    private boolean occupied(int row, int column) {
+    public boolean occupied(int row, int column) {
         return get(row, column) != null;
     }
 
-    private boolean blocked(int row, int column) {
+    public boolean blocked(int row, int column) {
         for(int r = row - 1; r <= row + 1; r++)
             for(int c = column - 1; c <= column + 1; c++)
                 if(valid(r, c) && !occupied(r, c)) return false;
@@ -116,7 +137,7 @@ public class Match {
         return false;
     }
 
-    private boolean valid(int row, int column) {
+    public boolean valid(int row, int column) {
         return row >= 0 && column >= 0 && row < ROWS && column < COLUMNS;
     }
 

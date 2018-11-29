@@ -43,8 +43,8 @@ public enum Command {
             case START:
                 return 0;
             case BEGIN:
-                // 2 arguments: identifier, player count
-                return 2;
+                // 12 arguments: identifier, player count, all positions
+                return 12;
             case PLAY:
                 // 3 arguments: row, column, card
                 return 3;

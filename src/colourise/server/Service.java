@@ -1,5 +1,6 @@
 package colourise.server;
 
+import colourise.ColouriseException;
 import colourise.networking.*;
 import colourise.networking.protocol.*;
 import colourise.networking.protocol.Error;
@@ -8,7 +9,6 @@ import colourise.state.lobby.LobbyFullException;
 import colourise.state.match.*;
 import colourise.state.player.CardAlreadyUsedException;
 import colourise.state.player.Player;
-import colourise.synchronisation.Consumer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -230,18 +230,32 @@ public class Service implements Listener {
         Match match = new Match(lobby.size());
         Iterator<Player> i1 = match.getPlayers().iterator();
         Iterator<Connection> i2 = lobby.getWaiters().iterator();
-        Message[] starts = new Message[match.getStarts().size()];
-        int i = 0;
-        for(Start start : match.getStarts())
-            starts[i++] = Message.Factory.played(start.getPlayer().getIdentifier(), start.getRow(), start.getColumn(), Card.NONE, match.getCurrent().getIdentifier());
         while(i1.hasNext() && i2.hasNext()) {
             Player player = i1.next();
             Connection connection = i2.next();
             players.put(connection, player);
             connections.put(player, connection);
             write(connection, Message.Factory.begin(player.getIdentifier(), match.getPlayers().size()));
-            for(Message start : starts)
-                write(connection, start);
+        }
+        Random random = new Random();
+        try {
+            for (int i = 0; i < match.getPlayers().size(); i++) {
+                Player player = match.getCurrent();
+                int row = 0;
+                int column = 0;
+                do {
+                    row = random.nextInt(match.getRows());
+                    column = random.nextInt(match.getColumns());
+                } while (match.occupied(row, column));
+                match.play(row, column, player, Card.NONE);
+                write(match, Message.Factory.played(player.getIdentifier(), row, column, Card.NONE, i == match.getPlayers().size() - 1 ? 0 : match.getPlayers().size()));
+            }
+        } catch(ColouriseException ex) {
+            ex.printStackTrace();
+            for(Player player : match.getPlayers()) {
+                connectionOf(player).disconnect();
+                disconnected(connectionOf(player));
+            }
         }
     }
 
