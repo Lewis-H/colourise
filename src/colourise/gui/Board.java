@@ -19,6 +19,7 @@ public class Board extends ProducerConsumerFrame<Message> {
     private final JPanel panel = new JPanel();
     public final Board self = this;
     private final int identifier;
+    private final Cards cards;
     private final MouseListener play = new MouseListener() {
         @Override
         public void mouseClicked(MouseEvent e) {}
@@ -32,7 +33,7 @@ public class Board extends ProducerConsumerFrame<Message> {
             int column = Math.round(e.getX() / grid.getScale()) - 1;
             try {
                 System.out.println("row: " + row + ", column:" + column);
-                getRequest().push(self, Message.Factory.play(row, column, Card.NONE));
+                getRequest().push(self, Message.Factory.play(row, column, cards.getCard()));
             }catch(InterruptedException ex) {
             }
         }
@@ -48,11 +49,13 @@ public class Board extends ProducerConsumerFrame<Message> {
         setTitle("Board");
         identifier = id;
         list = new PlayerList(scale, id, count);
+        cards = new Cards();
         grid.addMouseListener(play);
         for(Map.Entry<Integer, Position> position : positions.entrySet())
             grid.setColour(position.getValue().getRow(), position.getValue().getColumn(), Colours.getColour(position.getKey()));
         panel.add(grid, BorderLayout.WEST);
         panel.add(list, BorderLayout.EAST);
+        panel.add(cards, BorderLayout.SOUTH);
         add(panel);
         pack();
         setResizable(false);
@@ -66,6 +69,8 @@ public class Board extends ProducerConsumerFrame<Message> {
                 break;
             case PLAYED:
                 grid.setColour(message.getArgument(1), message.getArgument(2), Colours.getColour(message.getArgument(0)));
+                if(message.getArgument(0) == identifier)
+                    cards.used(Card.fromInt(message.getArgument(3)));
                 turn(message.getArgument(4));
                 repaint();
                 break;
@@ -76,20 +81,14 @@ public class Board extends ProducerConsumerFrame<Message> {
                 break;
             case END:
                 int max = 0;
-                ArrayList<Integer> winners = new ArrayList<>();
-                for(int i = 0; i < list.count(); i++) {
-                    if(message.getArgument(i) > max) {
-                        max = message.getArgument(i);
-                        winners.clear();
-                        winners.add(i);
-                    } else if(message.getArgument(i) == max) {
-                        winners.add(i);
-                    }
-                }
-                String dialogue = "";
-                for(int i = 0; i < winners.size(); i++)
-                    dialogue += (i == winners.size() - 1 ? (i == 0 ? "" : ", ") : " and ") + Colours.getName(winners.get(i));
-                dialogue += (winners.size() == 1 ? " is " : " are ") + "the winner" + (winners.size() == 1 ? "!" : " s!");
+                int winner = 0;
+                for(int i = 0; i < list.count(); i++)
+                    if(message.getArgument(i) >= max)
+                        winner = i;
+                String dialogue = Colours.getName(winner) + " is the winner!";
+                char[] ch = dialogue.toCharArray();
+                ch[0] = String.valueOf(ch[0]).toUpperCase().charAt(0);
+                dialogue = String.valueOf(ch);
                 JOptionPane.showMessageDialog(this, dialogue);
                 break;
         }

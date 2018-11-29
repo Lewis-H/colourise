@@ -28,8 +28,8 @@ public class Player {
     }
 
     public void play(int row, int column, Card card) throws MatchFinishedException, NotPlayersTurnException, InvalidPositionException, CannotPlayException, CardAlreadyUsedException {
-        use(card);
         match.play(row, column, this, card);
+        use(card);
     }
 
     private void use(Card card) throws CardAlreadyUsedException {

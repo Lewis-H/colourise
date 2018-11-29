@@ -19,7 +19,7 @@ public class Match {
     private boolean finished = false;
 
     public Player getCurrent() {
-        return players.get(current);
+        return players.size() == 0 ? null : players.get(current);
     }
 
     public Map<Player, Integer> getScoreboard() {
@@ -144,11 +144,11 @@ public class Match {
     private void refresh(boolean skip) throws MatchFinishedException {
         // Find the blocked players
         Set<Player> free = new HashSet<>(players.size() - blocked.size());
-        for(int r = 0; r < ROWS; r++) {
-            for (int c = 0; c < COLUMNS; c++) {
-                Player player = get(r, c);
-                if(player != null)
-                    if((player.has(Card.FREEDOM) || player.has(Card.REPLACEMENT)) && !free.contains(player) && !blocked(player) && !blocked(r, c))
+        for(int row = 0; row < ROWS; row++) {
+            for (int column = 0; column < COLUMNS; column++) {
+                Player player = get(row, column);
+                if(player != null && !free.contains(player) && !blocked(player))
+                    if((player.has(Card.FREEDOM) || player.has(Card.REPLACEMENT)) || !blocked(row, column))
                         free.add(player);
             }
         }
@@ -179,7 +179,7 @@ public class Match {
         Player current = getCurrent();
         players.remove(player);
         blocked.remove(player);
-        if(players.size() == blocked.size()) {
+        if(players.size() == blocked.size() || players.size() == 0) {
             finish();
         } else if(getCurrent() == player) {
             next();
