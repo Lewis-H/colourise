@@ -1,7 +1,6 @@
-package colourise.state.player;
+package colourise.state.match;
 
 import colourise.networking.protocol.Card;
-import colourise.state.match.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,10 +28,9 @@ public class Player {
 
     public void play(int row, int column, Card card) throws MatchFinishedException, NotPlayersTurnException, InvalidPositionException, CannotPlayException, CardAlreadyUsedException {
         match.play(row, column, this, card);
-        use(card);
     }
 
-    private void use(Card card) throws CardAlreadyUsedException {
+    void use(Card card) throws CardAlreadyUsedException {
         if(card != Card.NONE)
             if(!cards.remove(card))
                 throw new CardAlreadyUsedException(this, card);

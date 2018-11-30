@@ -1,15 +1,8 @@
 package colourise.client;
 
-import colourise.ColouriseException;
 import colourise.networking.protocol.Card;
 import colourise.networking.protocol.Message;
-import colourise.state.lobby.Lobby;
-import colourise.state.match.CannotPlayException;
-import colourise.state.match.InvalidPositionException;
-import colourise.state.match.Match;
-import colourise.state.match.NotPlayersTurnException;
-import colourise.state.player.Player;
-import colourise.state.match.MatchFinishedException;
+import colourise.state.match.*;
 
 import java.util.Iterator;
 
@@ -75,9 +68,9 @@ public class Game {
                 try {
                     for (Player player : match.getPlayers())
                         if (player.getIdentifier() == m.getArgument(0))
-                            match.play(m.getArgument(1), m.getArgument(2), player, Card.fromInt(m.getArgument(3)));
+                            player.play(m.getArgument(1), m.getArgument(2), Card.fromInt(m.getArgument(3)));
                 }catch(MatchFinishedException ex) {
-                } catch(NotPlayersTurnException | CannotPlayException | InvalidPositionException ex) {
+                } catch(NotPlayersTurnException | CannotPlayException | InvalidPositionException | CardAlreadyUsedException ex) {
                     ex.printStackTrace();
                     assert false; // Should never happen, crash if so
                 }

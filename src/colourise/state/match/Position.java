@@ -1,7 +1,5 @@
 package colourise.state.match;
 
-import colourise.state.player.Player;
-
 public final class Position {
     private final int row;
     private final int column;

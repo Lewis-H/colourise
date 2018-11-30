@@ -1,4 +1,4 @@
-package colourise.state.player;
+package colourise.state.match;
 
 import colourise.ColouriseException;
 

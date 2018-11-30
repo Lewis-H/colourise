@@ -1,7 +1,5 @@
 package colourise.state.match;
 
-import colourise.state.player.Player;
-
 public final class InvalidPositionException extends MatchException {
     private final int row, column;
     private final Player player;

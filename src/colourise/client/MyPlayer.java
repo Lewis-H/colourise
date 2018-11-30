@@ -2,10 +2,7 @@ package colourise.client;
 
 import colourise.networking.protocol.Card;
 import colourise.networking.protocol.Message;
-import colourise.state.player.Player;
-
-import java.util.HashSet;
-import java.util.Set;
+import colourise.state.match.Player;
 
 public final class MyPlayer {
     private final Player internal;

@@ -1,7 +1,6 @@
 package colourise.state.match;
 
 import colourise.networking.protocol.Card;
-import colourise.state.player.Player;
 
 import java.util.*;
 
@@ -12,14 +11,14 @@ public class Match {
     private final Map<Integer, Player> players = new HashMap<>(MAX_PLAYERS);
     private final Set<Player> blocked = new HashSet<>(MAX_PLAYERS);
     private final Map<Integer, Position> starts;
-    private final Player[][] grid = new Player[ROWS][COLUMNS];
+    private final Player[][] grid = new Player[getRows()][getColumns()];
     private final Map<Player, Integer> scoreboard = new HashMap<>(MAX_PLAYERS);
     private int current = 0;
     private int filled = 0;
     private boolean finished = false;
 
     public boolean isFull() {
-        return ROWS * COLUMNS == filled;
+        return getRows() * getColumns() == filled;
     }
 
     public Player getCurrent() {
@@ -59,8 +58,8 @@ public class Match {
             int row;
             int column;
             do {
-                row = random.nextInt(ROWS);
-                column = random.nextInt(COLUMNS);
+                row = random.nextInt(getRows());
+                column = random.nextInt(getColumns());
             } while(occupied(row, column));
             starts.put(i, new Position(row, column));
         }
@@ -85,7 +84,7 @@ public class Match {
         this.starts = starts;
     }
 
-    public void play(int row, int column, Player player, Card card) throws MatchFinishedException, NotPlayersTurnException, CannotPlayException, InvalidPositionException {
+    public void play(int row, int column, Player player, Card card) throws MatchFinishedException, NotPlayersTurnException, CannotPlayException, InvalidPositionException, CardAlreadyUsedException {
         if(player != getCurrent())
             throw new NotPlayersTurnException(this, player);
         if(isFinished())
@@ -94,7 +93,7 @@ public class Match {
         refresh(card == Card.DOUBLE_MOVE);
     }
 
-    private void place(int row, int column, Player player, Card card) throws CannotPlayException, InvalidPositionException {
+    private void place(int row, int column, Player player, Card card) throws CannotPlayException, InvalidPositionException, CardAlreadyUsedException {
         if(!valid(row, column))
             throw new InvalidPositionException(this, player, row, column);
         if((card == Card.FREEDOM || adjacent(row, column, player)) && (card == Card.REPLACEMENT || !occupied(row, column))) {
@@ -107,6 +106,8 @@ public class Match {
             grid[row][column] = player;
             // Increment the player's score
             increment(player);
+            // Mark card as used
+            player.use(card);
         }else{
             throw new CannotPlayException(this, player, row, column);
         }
@@ -135,7 +136,7 @@ public class Match {
         return true;
     }
 
-    private boolean blocked(Player player) {
+    public boolean blocked(Player player) {
         return blocked.contains(player);
     }
 
@@ -149,24 +150,23 @@ public class Match {
     }
 
     public boolean valid(int row, int column) {
-        return row >= 0 && column >= 0 && row < ROWS && column < COLUMNS;
+        return row >= 0 && column >= 0 && row < getRows() && column < getColumns();
     }
 
     private void refresh(boolean skip) throws MatchFinishedException {
         // Find the blocked players
         Set<Player> free = new HashSet<>(players.size() - blocked.size());
-        for(int row = 0; row < ROWS; row++) {
-            for (int column = 0; column < COLUMNS; column++) {
+        for(int row = 0; row < getRows(); row++) {
+            for(int column = 0; column < getColumns(); column++) {
                 Player player = get(row, column);
                 if(player != null && !free.contains(player) && !blocked(player))
                     if(((player.has(Card.FREEDOM) && !isFull()) || player.has(Card.REPLACEMENT)) || !blocked(row, column))
                         free.add(player);
             }
         }
-        for(Player player : players.values()) {
+        for(Player player : players.values())
             if(!free.contains(player) && !blocked(player))
                 blocked.add(player);
-        }
         // Set the next (free) player
         if(free.isEmpty())
             finish();

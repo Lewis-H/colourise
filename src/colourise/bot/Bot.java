@@ -1,18 +1,15 @@
 package colourise.bot;
 
 import colourise.client.MyPlayer;
-import colourise.networking.Binder;
 import colourise.networking.Connection;
 import colourise.networking.DisconnectedException;
 import colourise.networking.protocol.Card;
 import colourise.networking.protocol.Message;
 import colourise.networking.protocol.Parser;
 import colourise.state.match.*;
-import colourise.state.player.CardAlreadyUsedException;
-import colourise.state.player.Player;
+import colourise.state.match.CardAlreadyUsedException;
+import colourise.state.match.Player;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -25,8 +22,9 @@ public class Bot {
     private MyPlayer me;
     private final Parser parser = new Parser();
 
-    public Bot(String host, int port) throws IOException {
-        connection = Binder.connect(new InetSocketAddress(host, port));
+
+    public Bot(Connection connection) {
+        this.connection = connection;
     }
 
     public void start() throws CardAlreadyUsedException, MatchFinishedException, NotPlayersTurnException, CannotPlayException, InvalidPositionException, DisconnectedException {
