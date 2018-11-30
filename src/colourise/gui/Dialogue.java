@@ -12,31 +12,53 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.text.NumberFormat;
 
+/**
+ * Host input dialogue
+ */
 public final class Dialogue extends JFrame {
+    // Host label
     private final JLabel hostLabel = new JLabel("Host: ");
+    // Port label
     private final JLabel portLabel = new JLabel("Port: ");
+    // Label grid
     private final JPanel labels = new JPanel(new GridLayout(2, 1));
+    // Field grid
     private final JPanel fields = new JPanel(new GridLayout(2, 1));
+    // Host input field (default localhost)
     private final JTextField hostField = new JTextField("127.0.0.1");
+    // Formatted port field (numbers only)
     private final JFormattedTextField portField;
+    // Panels for layout
     private final JPanel middle = new JPanel(new FlowLayout(FlowLayout.CENTER));
     private final JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     private final JPanel split = new JPanel(new BorderLayout());
+    // Connect button
     private final JButton button = new JButton("Connect");
+    // Spectator checkbox
     private final JCheckBox spectate = new JCheckBox("Spectate", false);
 
+    /**
+     * Gets the host collected by this dialogue
+     * @return
+     */
     public String getHost() {
         return hostField.getText();
     }
 
+    /**
+     * Gets the port collected by this dialogue
+     * @return
+     */
     public int getPort() {
         return Integer.parseInt(portField.getText());
     }
 
+    /**
+     * Dialogue constructor
+     */
     public Dialogue() {
         super("Connect");
         portField = new JFormattedTextField(initNumberFormatter());
-        portField.setText("9000");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(middle, BorderLayout.CENTER);
@@ -60,6 +82,10 @@ public final class Dialogue extends JFrame {
         setResizable(false);
     }
 
+    /**
+     * Initialises the number formatter for the formatted text field.
+     * @return
+     */
     private JFormattedTextField.AbstractFormatter initNumberFormatter() {
         NumberFormat format = NumberFormat.getInstance();
         format.setGroupingUsed(false);
@@ -70,6 +96,10 @@ public final class Dialogue extends JFrame {
         return formatter;
     }
 
+    /**
+     * Processes the connect button click.
+     * @param e Event argument
+     */
     private void clicked(ActionEvent e) {
         try {
             Connection connection = Binder.connect(new InetSocketAddress(getHost(), getPort()));

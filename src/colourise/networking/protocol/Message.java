@@ -1,27 +1,54 @@
 package colourise.networking.protocol;
 
+/**
+ * Message representation
+ */
 public class Message {
+    // Command
     private final Command command;
+    // Byte arguments
     private final byte[] arguments;
 
+    /**
+     * Gets the command of the packet
+     * @return
+     */
     public Command getCommand() {
         return command;
     }
 
+    /**
+     * Gets the number of arguments in the packet
+     * @return
+     */
     public int arguments() {
         return arguments.length;
     }
 
+    /**
+     * Gets the argument at the specified index
+     * @param index
+     * @return
+     */
     public byte getArgument(int index) {
         return arguments[index];
     }
 
+    /**
+     * Message constructor
+     * @param command Message command
+     * @param arguments Message arguments
+     */
     public Message(Command command, byte[] arguments) {
         this.command = command;
         this.arguments = arguments;
         assert Command.getLength(command) == arguments.length;
     }
 
+    /**
+     * Convers the message into bytes
+     * @return Message as bytes
+     */
     public byte[] toBytes() {
         byte[] bytes = new byte[arguments.length + 1];
         bytes[0] = command.toByte();
@@ -30,6 +57,9 @@ public class Message {
         return bytes;
     }
 
+    /**
+     * Message factory utility (preverts repeated code)
+     */
     public static class Factory {
         public static Message hello(boolean spectate) { return new Message(Command.HELLO, new byte[] { (byte) (spectate ? 1 : 0) }); }
 

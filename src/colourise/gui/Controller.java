@@ -1,9 +1,7 @@
 package colourise.gui;
 
-import colourise.client.*;
 import colourise.networking.Connection;
 import colourise.networking.DisconnectedException;
-import colourise.networking.protocol.Command;
 import colourise.networking.protocol.Error;
 import colourise.networking.protocol.Message;
 import colourise.networking.protocol.Parser;
@@ -15,15 +13,29 @@ import colourise.synchronisation.RunnableConsumer;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Controller, provides some window flow control as the stages (connect, lobby, match) progress.
+ */
 public class Controller extends RunnableConsumer<Message> {
+    // Lobby frame
     private Lobby lobby;
+    // Board/game frame
     private Board board;
+    // Connection
     private Connection connection;
+    // Connection reader (Producer)
     private Reader reader;
-    private Parser parser;
+    // Consumer to forward messages to
     private Consumer<Message> forward = null;
+    // Whether this player is a spectator
     private final boolean spectate;
 
+    /**
+     * Controller constructor.
+     * @param connection Connection
+     * @param spectate Whether this connection is spectate only
+     * @throws DisconnectedException
+     */
     public Controller(Connection connection, boolean spectate) throws DisconnectedException {
         new Thread(reader = new Reader(connection)).start();
         reader.request(this);
@@ -31,16 +43,27 @@ public class Controller extends RunnableConsumer<Message> {
         write(Message.Factory.hello(this.spectate = spectate));
     }
 
+    /**
+     * Writes a message over the connection.
+     * @param message Message to write
+     * @return Bytes written
+     * @throws DisconnectedException
+     */
     private int write(Message message) throws DisconnectedException {
         byte[] bytes = message.toBytes();
         return connection.write(bytes);
     }
 
+    /**
+     * Processes the messages recieved from producers
+     * @param sender Producer which sent the message
+     * @param message Message
+     */
     @Override
     protected void consumed(Producer<Message> sender, Message message) {
-        System.out.println(message.getCommand());
         if(sender == reader) {
             switch (message.getCommand()) {
+                // HELLO acknowledged, joined the lobby
                 case JOINED:
                     if(lobby == null) {
                         lobby = new Lobby(message.getArgument(0));
@@ -50,6 +73,7 @@ public class Controller extends RunnableConsumer<Message> {
                         forward = lobby;
                     }
                     break;
+                // Game is starting
                 case BEGIN:
                     lobby.push(sender, message);
                     int count = message.getArgument(1);
@@ -61,12 +85,15 @@ public class Controller extends RunnableConsumer<Message> {
                     board.setVisible(true);
                     forward = board;
                     break;
+                // Something happened...
                 case ERROR:
                     System.out.println(Error.fromInt((int) message.getArgument(0)));
                     break;
             }
+            // Forward the message
             if(forward != null)
                 forward.push(sender, message);
+            // Request another
             reader.request(this);
         } else {
             try {
@@ -78,9 +105,16 @@ public class Controller extends RunnableConsumer<Message> {
         }
     }
 
+    /**
+     * Processes instruction to stop
+     * @param by
+     */
     @Override
     protected void stopped(Producer<Message> by) {
+        // Stops the reader
         reader.stop(this);
+        // Disconnects
+        connection.disconnect();
     }
 
     @Override

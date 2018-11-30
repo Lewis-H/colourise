@@ -3,6 +3,9 @@ package colourise.gui;
 import java.awt.*;
 
 public class Colours {
+    /**
+     * All possible Colours in the game.
+     */
     private static final Color[] colours = {
             Color.RED,
             Color.MAGENTA,
@@ -11,24 +14,34 @@ public class Colours {
             Color.PINK
     };
 
+    /**
+     * Converts an identifier into a colour.
+     * @param id Identifier
+     * @return Colour
+     */
     public static Color getColour(int id) {
         return colours[id];
     }
 
+    /**
+     * Gets the name of the colour for the specified identifier.
+     * @param id Identifier
+     * @return Colour name
+     */
     public static String getName(int id) {
         switch(id) {
             case 0:
-                return "red";
+                return "Red";
             case 1:
-                return "magenta";
+                return "Magenta";
             case 2:
-                return "yellow";
+                return "Yellow";
             case 3:
-                return "green";
+                return "Green";
             case 4:
-                return "pink";
+                return "Pink";
             default:
-                return "unknown";
+                return "Unknown";
         }
     }
 }

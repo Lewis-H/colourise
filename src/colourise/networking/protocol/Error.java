@@ -1,5 +1,8 @@
 package colourise.networking.protocol;
 
+/**
+ * Error enum
+ */
 public enum Error {
     CANNOT_PLAY,
     INVALID_POSITION,

@@ -182,4 +182,19 @@ public class MatchTests {
         }
         assertEquals(match.get(2, 0), players[0]);
     }
+
+    @Test
+    public void cannotReplacePosition() {
+        Match match = setupTwoPlayerMatch();
+        Player[] players = new Player[2];
+        for(Player player : match.getPlayers())
+            players[player.getIdentifier()] = player;
+        try {
+            players[0].play(1, 0, Card.NONE);
+        } catch(CannotPlayException ex) {
+            return; // success
+        } catch(ColouriseException ex) {
+            fail("Exception thrown: " + ex.toString());
+        }
+    }
 }

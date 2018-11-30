@@ -1,6 +1,10 @@
 package colourise.networking.protocol;
 
+/**
+ * Command enum.
+ */
 public enum Command {
+    // Command types
     HELLO,
     JOINED,
     LEAD,
@@ -15,14 +19,28 @@ public enum Command {
     // Expensive operation, cached here
     private static final Command[] values = Command.values();
 
+    /**
+     * Converts an integer into a command
+     * @param i Integer to convert
+     * @return Converted command
+     */
     public static Command fromInt(int i) {
         return values[i];
     }
 
+    /**
+     * Converts an command into a byte
+     * @return Command as a byte
+     */
     public byte toByte() {
         return (byte) ordinal();
     }
 
+    /**
+     * Gets the argument length of a command.
+     * @param command The command
+     * @return The number of arguments
+     */
     public static int getLength(Command command) {
         switch(command) {
             case HELLO:

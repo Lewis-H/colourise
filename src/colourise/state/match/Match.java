@@ -66,7 +66,7 @@ public class Match {
         for(Map.Entry<Integer, Position> start : starts.entrySet()) {
             Player player = new Player(this, start.getKey());
             players.put(player.getIdentifier(), player);
-            scoreboard.put(player, 0);
+            scoreboard.put(player, 1);
             grid[start.getValue().getRow()][start.getValue().getColumn()] = player;
             ++filled;
         }
@@ -77,7 +77,7 @@ public class Match {
         for(Map.Entry<Integer, Position> start : starts.entrySet()) {
             Player player = new Player(this, start.getKey());
             players.put(player.getIdentifier(), player);
-            scoreboard.put(player, 0);
+            scoreboard.put(player, 1);
             grid[start.getValue().getRow()][start.getValue().getColumn()] = player;
             ++filled;
         }
@@ -113,22 +113,48 @@ public class Match {
         }
     }
 
+    /**
+     * Increments the specified players score
+     * @param player
+     */
     private void increment(Player player) {
         scoreboard.put(player, scoreboard.get(player) + 1);
     }
 
+    /**
+     * Decrements the specified players score
+     * @param player
+     */
     private void decrement(Player player) {
         scoreboard.put(player, scoreboard.get(player) - 1);
     }
 
+    /**
+     * Gets the specified player occupying a position
+     * @param row
+     * @param column
+     * @return
+     */
     public Player get(int row, int column) {
         return grid[row][column];
     }
 
+    /**
+     * Gets whether the specified position is occupied
+     * @param row
+     * @param column
+     * @return
+     */
     public boolean occupied(int row, int column) {
         return get(row, column) != null;
     }
 
+    /**
+     * Gets whether the specified position is blocked
+     * @param row
+     * @param column
+     * @return
+     */
     public boolean blocked(int row, int column) {
         for(int r = row - 1; r <= row + 1; r++)
             for(int c = column - 1; c <= column + 1; c++)
@@ -136,10 +162,22 @@ public class Match {
         return true;
     }
 
+    /**
+     * Gets whether the specified player is blocked
+     * @param player
+     * @return
+     */
     public boolean blocked(Player player) {
         return blocked.contains(player);
     }
 
+    /**
+     * Gets whether the specified player has a position adjacent to the specified position
+     * @param row
+     * @param column
+     * @param player
+     * @return
+     */
     public boolean adjacent(int row, int column, Player player) {
         for(int r = row - 1; r <= row + 1; r++)
             for(int c = column - 1; c <= column + 1; c++)
@@ -149,10 +187,21 @@ public class Match {
         return false;
     }
 
+    /**
+     * Gets whether the specified position is valid
+     * @param row
+     * @param column
+     * @return
+     */
     public boolean valid(int row, int column) {
         return row >= 0 && column >= 0 && row < getRows() && column < getColumns();
     }
 
+    /**
+     * Refreshes the match after each play
+     * @param skip
+     * @throws MatchFinishedException
+     */
     private void refresh(boolean skip) throws MatchFinishedException {
         // Find the blocked players
         Set<Player> free = new HashSet<>(players.size() - blocked.size());
@@ -175,6 +224,10 @@ public class Match {
             next();
     }
 
+    /**
+     * Selects the player whose turn it is next
+     * @throws MatchFinishedException
+     */
     private void next() throws MatchFinishedException {
         if(players.size() == blocked.size()) finish();
         for(int t = current + 1; t <= MAX_PLAYERS + current; t++) {
@@ -188,16 +241,25 @@ public class Match {
         }
     }
 
+    /**
+     * Removes the specified player from the match
+     * @param player
+     * @throws MatchFinishedException
+     */
     public void leave(Player player) throws MatchFinishedException {
-        players.remove(player);
+        players.remove(player.getIdentifier());
         blocked.remove(player);
-        if(players.size() == blocked.size() || players.size() == 0) {
+        if(players.size() == blocked.size()) {
             finish();
-        } else if(getCurrent() == player) {
+        } else if(current == player.getIdentifier()) {
             next();
         }
     }
 
+    /**
+     * Finishes the match
+     * @throws MatchFinishedException
+     */
     private void finish() throws MatchFinishedException {
         finished = true;
         throw new MatchFinishedException(this);

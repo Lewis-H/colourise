@@ -12,17 +12,34 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.*;
 
+/**
+ * Game server service.
+ */
 public class Service implements Listener {
+    // Map of connections to players
     private final Map<Connection, Player> players = new HashMap<>();
+    // Map of players to connections
     private final Map<Player, Connection> connections = new HashMap<>();
+    // Map of connections to parsers
     private final Map<Connection, Parser> parsers = new HashMap<>();
+    // The lobby
     private final Lobby<Connection> lobby;
+    // The underlying server
     private final Server server;
+    // Set of connections to be removed after the next read loop is complete
     private final Set<Connection> disconnected = new HashSet<>();
+    // Set of joining specators
     private final Set<Connection> spectate = new HashSet<>();
+    // Map of matches to connections which are spectating it
     private final Map<Match, Set<Connection>> spectated = new HashMap<>();
+    // Map of connections and the matches they are spectating
     private final Map<Connection, Match> spectating = new HashMap<>();
 
+    /**
+     * Initialises the servive.
+     * @param address Bind address
+     * @throws IOException
+     */
     public Service(InetSocketAddress address) throws IOException {
         if(address == null)
             throw new IllegalArgumentException("address");
@@ -30,28 +47,52 @@ public class Service implements Listener {
         server = Binder.listen(address, this);
     }
 
+    /**
+     * Listens for requests
+     * @throws IOException
+     */
     public void listen() throws IOException {
         server.listen();
     }
 
+    /**
+     * Gets the parser of the specified connection
+     * @param connection Connection
+     * @return
+     */
     private Parser parserOf(Connection connection) {
         if(connection == null)
             throw new IllegalArgumentException("connection");
         return parsers.get(connection);
     }
 
+    /**
+     * Gets the connection of the specifier player
+     * @param player Player
+     * @return
+     */
     private Connection connectionOf(Player player) {
         if(player == null)
             throw new IllegalArgumentException("player");
         return connections.get(player);
     }
 
+    /**
+     * Gets the player of the specified connection
+     * @param connection Connection
+     * @return
+     */
     private Player playerOf(Connection connection) {
         if(connection == null)
             throw new IllegalArgumentException("connection");
         return players.get(connection);
     }
 
+    /**
+     * Gets the spectators of the specified match
+     * @param match Match
+     * @return
+     */
     private Set<Connection> spectatorsOf(Match match) {
         if(match == null)
             throw new IllegalArgumentException("match");
@@ -60,20 +101,23 @@ public class Service implements Listener {
 
     @Override
     public void connected(Connection connection) {
+        // New connection
         if(connection == null)
             throw new IllegalArgumentException("connection");
-        System.out.println("Client connected");
         parsers.put(connection, new Parser());
     }
 
     private void join(Connection connection, boolean spectator) {
+        // Joining the lobby
         if(connection == null)
             throw new IllegalArgumentException("connection");
         try {
             if(spectator) {
+                // Set up as spectator
                 spectate.add(connection);
                 write(connection, Message.Factory.joined(lobby.size()));
             } else {
+                // Join the lobby
                 lobby.join(connection);
                 Message message = Message.Factory.joined(lobby.size());
                 write(lobby, message);
@@ -81,7 +125,7 @@ public class Service implements Listener {
                 if (lobby.getLeader() == connection)
                     write(connection, Message.Factory.lead());
                 if (lobby.size() == lobby.capacity())
-                    started(lobby, spectate);
+                    started(lobby, spectate); // Start match
             }
         } catch(LobbyFullException ex) {
             // Shouldn't happen as size and capacity are checked.
@@ -92,10 +136,11 @@ public class Service implements Listener {
 
     @Override
     public void disconnected(Connection connection) {
+        // Connection has disconnected
         if(connection == null)
             throw new IllegalArgumentException("connection");
-        System.out.println("Client disconnected");
         Player player = playerOf(connection);
+        // Tidy up objects in maps/lists/sets
         if(player != null) { // Player is in a game.
             try {
                 left(connection, player);
@@ -129,12 +174,15 @@ public class Service implements Listener {
 
     @Override
     public void read(Connection connection) {
+        // Data is available to be read on the connection
         if(connection == null)
             throw new IllegalArgumentException("connection");
         try {
+            // Read to the parser until no more bytes are required
             parserOf(connection).add(connection.read(parserOf(connection).getRemaining()));
             if (parserOf(connection).getRemaining() == 0) {
                 Player p = players.get(connection);
+                // Process the packet
                 if (p != null)
                     received(p, parserOf(connection).create());
                 else
@@ -154,11 +202,12 @@ public class Service implements Listener {
     }
 
     private void received(Connection connection, Message message) {
+        // Message handler, no player
         switch(message.getCommand()) {
-            case HELLO:
+            case HELLO: // First packet
                 join(connection, message.getArgument(0) == 1);
                 break;
-            case START:
+            case START: // Starts the game
                 if(connection == lobby.getLeader())
                     started(lobby, spectate);
                 break;
@@ -166,6 +215,7 @@ public class Service implements Listener {
     }
 
     private void received(Player player, Message message) {
+        // Message handler, with player
         if(player == null)
             throw new IllegalArgumentException("player");
         if(message == null)
@@ -173,9 +223,10 @@ public class Service implements Listener {
         Connection connection = connectionOf(player);
         Match match = player.getMatch();
         switch(message.getCommand()) {
-            case PLAY:
+            case PLAY: // Player has played a position
                 Card card = Card.fromInt(message.getArgument(2));
                 try {
+                    // Update game state
                     player.play(message.getArgument(0), message.getArgument(1), card);
                     write(match, Message.Factory.played(player.getIdentifier(), message.getArgument(0), message.getArgument(1), card, match.getCurrent().getIdentifier()));
                 } catch (NotPlayersTurnException ex) {
@@ -197,6 +248,7 @@ public class Service implements Listener {
         }
     }
 
+    // Various write commands to avoid repetition
     private int write(Connection connection, byte[] bytes) {
         if(connection == null)
             throw new IllegalArgumentException("connection");
@@ -255,21 +307,31 @@ public class Service implements Listener {
         write(spectatorsOf(match), bytes);
     }
 
+    /**
+     * Starts a match from a lobby
+     * @param lobby
+     * @param spectators
+     */
     public void started(Lobby<Connection> lobby, Set<Connection> spectators) {
         if(lobby == null)
             throw new IllegalArgumentException("connections");
+        // Create match
         Match match = new Match(lobby.size());
+        // Prepare spectators
         spectated.put(match, new HashSet<>(spectators));
         for(Connection connection : spectators)
             spectating.put(connection, match);
+        // Prepare connection/player pairing
         Iterator<Player> i1 = match.getPlayers().iterator();
         Iterator<Connection> i2 = lobby.getWaiters().iterator();
+        // Prepare starting positions for sending
         int[] rows = new int[5];
         int[] columns = new int[5];
         for(Map.Entry<Integer, Position> start : match.getStarts().entrySet()) {
             rows[start.getKey()] = start.getValue().getRow();
             columns[start.getKey()] = start.getValue().getColumn();
         }
+        // Send starting positions and populate maps
         while(i1.hasNext() && i2.hasNext()) {
             Player player = i1.next();
             Connection connection = i2.next();
@@ -304,10 +366,15 @@ public class Service implements Listener {
                 rows[4],
                 columns[4]
         ));
+        // Clear lobby collections
         spectators.clear();
         lobby.clear();
     }
 
+    /**
+     * Cleans up a match after it has finished
+     * @param match Match which has finished
+     */
     public void finished(Match match) {
         if(match == null)
             throw new IllegalArgumentException("match");

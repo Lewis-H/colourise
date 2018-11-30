@@ -15,18 +15,19 @@ import java.util.Scanner;
 
 public class Program {
     public static void main(String[] args) {
+        // Ask for server details
         System.out.println("Meep morp, I am a bot.");
         Scanner scanner = new Scanner(System.in);
         System.out.print("Please enter the host: ");
-        String host = "127.0.0.1"; //scanner.nextLine();
+        String host = scanner.nextLine();
         System.out.print("Please enter the port: ");
-        int port = 9000; //scanner.nextInt();
+        int port = scanner.nextInt();
         System.out.println("Thanks. Connecting...");
         try {
             Connection connection = Binder.connect(new InetSocketAddress(host, port));
             try {
                 Bot bot = new Bot(connection);
-                System.out.println("Et voila, we're connected.");
+                System.out.println("We're connected!");
                 bot.start();
             } catch(DisconnectedException ex) {
                 System.out.println("The server said goodbye. Goodbye!");

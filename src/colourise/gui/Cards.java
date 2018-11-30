@@ -5,15 +5,24 @@ import colourise.networking.protocol.Card;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Card display
+ */
 public final class Cards extends JPanel {
+    // Freedom card button
     private final JButton freedom = new JButton("Freedom");
+    // Double move card button
     private final JButton doubleMove = new JButton("Double Move");
+    // Replacement card button
     private final JButton replacement = new JButton("Replacement");
+    // Normal button colour
     private final Color normal;
+    // Card in use
     private Card card = Card.NONE;
 
     public Cards() {
         normal = freedom.getBackground();
+        // Button listeners
         freedom.addActionListener(e -> {
             if(freedom.getBackground() == normal) {
                 card = Card.FREEDOM;
@@ -56,6 +65,7 @@ public final class Cards extends JPanel {
         return card;
     }
 
+    // Mark card as used (disable button)
     public void used(Card card) {
         this.card = Card.NONE;
         if(card == Card.FREEDOM) {
