@@ -23,10 +23,11 @@ public class Controller extends RunnableConsumer<Message> {
     private Parser parser;
     private Consumer<Message> forward = null;
 
-    public Controller(Connection connection) {
+    public Controller(Connection connection, boolean spectate) throws DisconnectedException {
         new Thread(reader = new Reader(connection)).start();
         reader.request(this);
         this.connection = connection;
+        write(Message.Factory.hello(spectate));
     }
 
     private int write(Message message) throws DisconnectedException {
@@ -39,12 +40,14 @@ public class Controller extends RunnableConsumer<Message> {
         System.out.println(message.getCommand());
         if(sender == reader) {
             switch (message.getCommand()) {
-                case HELLO:
-                    lobby = new Lobby(message.getArgument(0));
-                    lobby.request(this);
-                    lobby.setLocationRelativeTo(null);
-                    lobby.setVisible(true);
-                    forward = lobby;
+                case JOINED:
+                    if(lobby == null) {
+                        lobby = new Lobby(message.getArgument(0));
+                        lobby.request(this);
+                        lobby.setLocationRelativeTo(null);
+                        lobby.setVisible(true);
+                        forward = lobby;
+                    }
                     break;
                 case BEGIN:
                     lobby.push(sender, message);

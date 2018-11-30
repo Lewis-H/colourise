@@ -1,6 +1,5 @@
 package colourise.server;
 
-import colourise.ColouriseException;
 import colourise.networking.*;
 import colourise.networking.protocol.*;
 import colourise.networking.protocol.Error;
@@ -9,8 +8,6 @@ import colourise.state.lobby.LobbyFullException;
 import colourise.state.match.*;
 import colourise.state.player.CardAlreadyUsedException;
 import colourise.state.player.Player;
-import javafx.geometry.Pos;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.*;
@@ -22,6 +19,8 @@ public class Service implements Listener {
     private final Lobby<Connection> lobby;
     private final Server server;
     private final Set<Connection> disconnected = new HashSet<>();
+    private final Set<Connection> spectators = new HashSet<>();
+    private final Map<Match, Set<Connection>> spectating = new HashMap<>();
 
     public Service(InetSocketAddress address) throws IOException {
         if(address == null)
@@ -58,26 +57,27 @@ public class Service implements Listener {
             throw new IllegalArgumentException("connection");
         System.out.println("Client connected");
         parsers.put(connection, new Parser());
-        join(connection);
     }
 
-    private void join(Connection connection) {
+    private void join(Connection connection, boolean spectator) {
         if(connection == null)
             throw new IllegalArgumentException("connection");
         try {
-            write(lobby, Message.Factory.joined(lobby.size() + 1));
-            lobby.join(connection);
-            if(lobby.size() == lobby.capacity())
-                throw new LobbyFullException(lobby);
-            write(connection, Message.Factory.hello(lobby.size()));
-            if(lobby.getLeader() == connection)
-                write(connection, Message.Factory.lead());
+            if(spectator) {
+                spectators.add(connection);
+                write(connection, Message.Factory.joined(lobby.size()));
+            } else {
+                lobby.join(connection);
+                write(lobby, Message.Factory.joined(lobby.size()));
+                if (lobby.getLeader() == connection)
+                    write(connection, Message.Factory.lead());
+                if (lobby.size() == lobby.capacity())
+                    started(lobby);
+            }
         } catch(LobbyFullException ex) {
-            write(connection, Message.Factory.hello(lobby.size()));
-            if(lobby.getLeader() == connection)
-                write(connection, Message.Factory.lead());
+            // Shouldn't happen as size and capacity are checked.
             started(lobby);
-            lobby.clear();
+            join(connection, spectator);
         }
     }
 
@@ -139,6 +139,9 @@ public class Service implements Listener {
 
     private void received(Connection connection, Message message) {
         switch(message.getCommand()) {
+            case HELLO:
+                join(connection, message.getArgument(0) == 1);
+                break;
             case START:
                 if(connection == lobby.getLeader())
                     started(lobby);
@@ -210,6 +213,10 @@ public class Service implements Listener {
             write(connection, bytes);
     }
 
+    private void write(Collection<Connection> connections, Message message) {
+
+    }
+
     private void write(Match match, Message message) {
         if(match == null)
             throw new IllegalArgumentException("match");
@@ -252,6 +259,7 @@ public class Service implements Listener {
                     columns[4]
             ));
         }
+        lobby.clear();
     }
 
     public void finished(Match match) {

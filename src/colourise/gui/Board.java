@@ -4,13 +4,11 @@ import colourise.networking.protocol.Card;
 import colourise.networking.protocol.Message;
 import colourise.state.match.Position;
 import colourise.synchronisation.Producer;
-import javafx.geometry.Pos;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
 import java.util.Map;
 
 public class Board extends ProducerConsumerFrame<Message> {
@@ -50,12 +48,13 @@ public class Board extends ProducerConsumerFrame<Message> {
         identifier = id;
         list = new PlayerList(scale, id, count);
         cards = new Cards();
+        cards.setOpaque(false);
         grid.addMouseListener(play);
         for(Map.Entry<Integer, Position> position : positions.entrySet())
             grid.setColour(position.getValue().getRow(), position.getValue().getColumn(), Colours.getColour(position.getKey()));
         panel.add(grid, BorderLayout.WEST);
         panel.add(list, BorderLayout.EAST);
-        panel.add(cards, BorderLayout.SOUTH);
+        panel.add(cards, BorderLayout.NORTH);
         add(panel);
         pack();
         setResizable(false);
@@ -82,9 +81,12 @@ public class Board extends ProducerConsumerFrame<Message> {
             case END:
                 int max = 0;
                 int winner = 0;
-                for(int i = 0; i < list.count(); i++)
-                    if(message.getArgument(i) >= max)
+                for(int i = 0; i < list.count(); i++) {
+                    if (message.getArgument(i) >= max) {
                         winner = i;
+                        max = message.getArgument(i);
+                    }
+                }
                 String dialogue = Colours.getName(winner) + " is the winner!";
                 char[] ch = dialogue.toCharArray();
                 ch[0] = String.valueOf(ch[0]).toUpperCase().charAt(0);

@@ -15,9 +15,9 @@ public class Program {
         System.out.println("Meep morp, I am a bot.");
         Scanner scanner = new Scanner(System.in);
         System.out.print("Please enter the host: ");
-        String host = scanner.nextLine();
+        String host = "127.0.0.1"; //scanner.nextLine();
         System.out.print("Please enter the port: ");
-        int port = scanner.nextInt();
+        int port = 9000; //scanner.nextInt();
         System.out.println("Thanks. Connecting...");
         try {
             Bot bot = new Bot(host, port);

@@ -31,9 +31,7 @@ public class Message {
     }
 
     public static class Factory {
-        public static Message hello(int count) {
-            return new Message(Command.HELLO, new byte[]{ (byte) count });
-        }
+        public static Message hello(boolean spectate) { return new Message(Command.HELLO, new byte[] { (byte) (spectate ? 1 : 0) }); }
 
         public static Message lead() {
             return new Message(Command.LEAD, new byte[0]);

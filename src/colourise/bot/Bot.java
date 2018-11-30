@@ -10,7 +10,6 @@ import colourise.networking.protocol.Parser;
 import colourise.state.match.*;
 import colourise.state.player.CardAlreadyUsedException;
 import colourise.state.player.Player;
-import javafx.geometry.Pos;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -31,6 +30,7 @@ public class Bot {
     }
 
     public void start() throws CardAlreadyUsedException, MatchFinishedException, NotPlayersTurnException, CannotPlayException, InvalidPositionException, DisconnectedException {
+        write(Message.Factory.hello(false));
         while(true) {
             while (parser.getRemaining() != 0)
                 parser.add(connection.read(parser.getRemaining()));
@@ -43,7 +43,7 @@ public class Bot {
         System.out.println(message.getCommand());
         if(lobby == 0 && match == null) {
             switch(message.getCommand()) {
-                case HELLO:
+                case JOINED:
                     lobby = message.getArgument(0);
                     break;
             }
@@ -138,17 +138,17 @@ public class Bot {
         List<Position> positions = new ArrayList<>();
         for(int row = 0; row < match.getRows(); row++)
             for(int column = 0; column < match.getColumns(); column++)
-                positions.add(new Position(row, column));
+                if(!match.occupied(row, column))
+                    positions.add(new Position(row, column));
         return positions;
     }
 
     private List<Position> scanReplacement() {
         List<Position> positions = new ArrayList<>();
-        for(Position position : scan())
-            for(int row = position.getRow() - 1; row <= position.getRow() + 1; row += 2)
-                for(int column = position.getColumn() - 1; column <= position.getColumn() + 1; column += 2)
-                    if(match.valid(row, column) && match.get(row, column) != me.getInternal())
-                        positions.add(new Position(row, column));
+        for(int row = 0; row < match.getRows(); row++)
+            for(int column = 0; column < match.getColumns(); column++)
+                if(match.occupied(row, column) && match.adjacent(row, column, me.getInternal()))
+                    positions.add(new Position(row, column));
         return positions;
     }
 

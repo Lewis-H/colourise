@@ -1,18 +1,13 @@
 package colourise.gui;
 
-import colourise.client.Game;
-import colourise.client.Stage;
 import colourise.networking.Binder;
 import colourise.networking.Connection;
 import colourise.networking.DisconnectedException;
-import colourise.networking.protocol.Message;
-import colourise.networking.protocol.Parser;
 
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.text.NumberFormat;
@@ -24,10 +19,11 @@ public final class Dialogue extends JFrame {
     private final JPanel fields = new JPanel(new GridLayout(2, 1));
     private final JTextField hostField = new JTextField("127.0.0.1");
     private final JFormattedTextField portField;
-    private final JPanel top = new JPanel(new FlowLayout(FlowLayout.CENTER));
+    private final JPanel middle = new JPanel(new FlowLayout(FlowLayout.CENTER));
     private final JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     private final JPanel split = new JPanel(new BorderLayout());
-    private final JButton button = new JButton("Submit");
+    private final JButton button = new JButton("Connect");
+    private final JCheckBox spectate = new JCheckBox("Spectate", false);
 
     public String getHost() {
         return hostField.getText();
@@ -40,10 +36,11 @@ public final class Dialogue extends JFrame {
     public Dialogue() {
         super("Connect");
         portField = new JFormattedTextField(initNumberFormatter());
+        portField.setText("9000");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(top, BorderLayout.NORTH);
-        top.add(split);
+        getContentPane().add(middle, BorderLayout.CENTER);
+        middle.add(split);
         split.add(labels, BorderLayout.CENTER);
         split.add(fields, BorderLayout.EAST);
         getContentPane().add(bottom, BorderLayout.SOUTH);
@@ -55,9 +52,10 @@ public final class Dialogue extends JFrame {
         labels.add(portLabel);
         portField.setColumns(15);
         fields.add(portField);
-        button.addActionListener(this::clicked);
-        bottom.add(button);
+        bottom.add(spectate, BorderLayout.WEST);
+        bottom.add(button, BorderLayout.EAST);
         pack();
+        setSize(250, getHeight());
         setResizable(false);
     }
 
@@ -74,10 +72,12 @@ public final class Dialogue extends JFrame {
     private void clicked(ActionEvent e) {
         try {
             Connection connection = Binder.connect(new InetSocketAddress(getHost(), getPort()));
-            new Thread(new Controller(connection)).start();
+            new Thread(new Controller(connection, spectate.isSelected())).start();
             setVisible(false);
-        } catch (IOException ex) {
+        } catch(IOException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage());
+        } catch(DisconnectedException ex) {
+            JOptionPane.showMessageDialog(this, "The server unexpectedly closed the connection.");
         }
     }
 }

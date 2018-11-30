@@ -2,13 +2,12 @@ package colourise.state.match;
 
 import colourise.networking.protocol.Card;
 import colourise.state.player.Player;
-import javafx.geometry.Pos;
 
 import java.util.*;
 
 public class Match {
     public static final int MAX_PLAYERS = 5;
-    private final int ROWS = 6,
+    private static final int ROWS = 6,
                       COLUMNS = 10;
     private final Map<Integer, Player> players = new HashMap<>(MAX_PLAYERS);
     private final Set<Player> blocked = new HashSet<>(MAX_PLAYERS);
@@ -70,6 +69,7 @@ public class Match {
             players.put(player.getIdentifier(), player);
             scoreboard.put(player, 0);
             grid[start.getValue().getRow()][start.getValue().getColumn()] = player;
+            ++filled;
         }
         this.starts = starts;
     }
@@ -80,6 +80,7 @@ public class Match {
             players.put(player.getIdentifier(), player);
             scoreboard.put(player, 0);
             grid[start.getValue().getRow()][start.getValue().getColumn()] = player;
+            ++filled;
         }
         this.starts = starts;
     }
@@ -94,7 +95,8 @@ public class Match {
     }
 
     private void place(int row, int column, Player player, Card card) throws CannotPlayException, InvalidPositionException {
-        if(!valid(row, column)) throw new InvalidPositionException(this, player, row, column);
+        if(!valid(row, column))
+            throw new InvalidPositionException(this, player, row, column);
         if((card == Card.FREEDOM || adjacent(row, column, player)) && (card == Card.REPLACEMENT || !occupied(row, column))) {
             // If the space is occupied (i.e. the replacement card has been used) then decrement the score of the player occupying the space
             if(occupied(row, column))
@@ -140,7 +142,9 @@ public class Match {
     public boolean adjacent(int row, int column, Player player) {
         for(int r = row - 1; r <= row + 1; r++)
             for(int c = column - 1; c <= column + 1; c++)
-                if(valid(r, c) && get(r, c) == player) return true;
+                if(!(r == row && c == column))
+                    if(valid(r, c) && get(r, c) == player)
+                        return true;
         return false;
     }
 
@@ -173,11 +177,13 @@ public class Match {
 
     private void next() throws MatchFinishedException {
         if(players.size() == blocked.size()) finish();
-        for(int t = current + 1; t <= players.size() + current; t++) {
-            int i = t % players.size();
-            if(!blocked.contains(players.get(i))) {
-                current = i;
-                break;
+        for(int t = current + 1; t <= MAX_PLAYERS + current; t++) {
+            int i = t % MAX_PLAYERS;
+            if(players.containsKey(i)) {
+                if (!blocked.contains(players.get(i))) {
+                    current = i;
+                    break;
+                }
             }
         }
     }
@@ -185,7 +191,6 @@ public class Match {
     public void leave(Player player) throws MatchFinishedException {
         players.remove(player);
         blocked.remove(player);
-        Player c = getCurrent();
         if(players.size() == blocked.size() || players.size() == 0) {
             finish();
         } else if(getCurrent() == player) {

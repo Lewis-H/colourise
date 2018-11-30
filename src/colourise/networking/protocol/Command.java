@@ -2,8 +2,8 @@ package colourise.networking.protocol;
 
 public enum Command {
     HELLO,
-    LEAD,
     JOINED,
+    LEAD,
     LEFT,
     START,
     BEGIN,
@@ -26,13 +26,13 @@ public enum Command {
     public static int getLength(Command command) {
         switch(command) {
             case HELLO:
-                // 1 arguments: count
+                // 1 argument: spectating
                 return 1;
-            case LEAD:
-                return 0;
             case JOINED:
                 // 1 argument: count
                 return 1;
+            case LEAD:
+                return 0;
             case LEFT:
                 // 2 argument: identifier/count (match/lobby), next
                 return 2;

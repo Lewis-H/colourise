@@ -1,18 +1,20 @@
 package colourise.state.lobby;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Lobby<T> {
     private T leader = null;
-    private final Set<T> waiting = new HashSet<>(5);
+    private final List<T> waiting = new ArrayList<>(5);
     private final int capacity;
 
     public T getLeader() {
         return leader;
     }
 
-    public Set<T> getWaiters() {
+    public List<T> getWaiters() {
         return waiting;
     }
 

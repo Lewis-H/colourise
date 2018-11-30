@@ -41,13 +41,12 @@ public class Game {
 
     public void update(Message m) {
         switch (m.getCommand()) {
-            case HELLO:
-                leader = m.getArgument(0) != 0;
-                lobby = m.getArgument(1);
-                stage = Stage.LOBBY;
-                break;
             case JOINED:
+                stage = Stage.LOBBY;
                 lobby = m.getArgument(0);
+                break;
+            case LEAD:
+                leader = true;
                 break;
             case LEFT:
                 if (match == null)

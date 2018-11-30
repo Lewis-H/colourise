@@ -6,7 +6,8 @@ import colourise.state.player.Player;
 import org.junit.Test;
 
 public class MatchTests {
-    /*@Test
+    /*
+    @Test
     public void testMakeMove() {
         Match match = new Match(1);
         Player player = match.getPlayers().iterator().next();

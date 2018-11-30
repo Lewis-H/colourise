@@ -21,8 +21,8 @@ public final class Cards extends JPanel {
                 doubleMove.setBackground(normal);
                 replacement.setBackground(normal);
             }else{
-                freedom.setBackground(Color.ORANGE);
                 card = Card.NONE;
+                freedom.setBackground(normal);
             }
         });
         doubleMove.addActionListener(e -> {
@@ -32,7 +32,8 @@ public final class Cards extends JPanel {
                 freedom.setBackground(normal);
                 replacement.setBackground(normal);
             }else{
-                doubleMove.setBackground(Color.ORANGE);
+                card = Card.NONE;
+                doubleMove.setBackground(normal);
             }
         });
         replacement.addActionListener(e -> {
@@ -42,7 +43,8 @@ public final class Cards extends JPanel {
                 freedom.setBackground(normal);
                 doubleMove.setBackground(normal);
             }else{
-                replacement.setBackground(Color.ORANGE);
+                card = Card.NONE;
+                replacement.setBackground(normal);
             }
         });
         add(freedom);

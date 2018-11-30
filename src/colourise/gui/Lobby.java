@@ -11,7 +11,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Lobby extends ProducerConsumerFrame<Message> {
-    private final JLabel message = new JLabel("Waiting for players...");
+    private final JLabel message = new JLabel("Waiting for players...", SwingConstants.CENTER);
     private boolean leader;
     private int players;
     private final JLabel count;
@@ -31,7 +31,7 @@ public class Lobby extends ProducerConsumerFrame<Message> {
         button.addActionListener(this::clicked);
         top.add(button);
         panel.add(top);
-        middle.add(message);
+        middle.add(message, BorderLayout.CENTER);
         panel.add(middle);
         button.setEnabled(false);
         bottom.add(count);
