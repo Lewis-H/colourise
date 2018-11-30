@@ -53,6 +53,7 @@ public final class Dialogue extends JFrame {
         portField.setColumns(15);
         fields.add(portField);
         bottom.add(spectate, BorderLayout.WEST);
+        button.addActionListener(this::clicked);
         bottom.add(button, BorderLayout.EAST);
         pack();
         setSize(250, getHeight());

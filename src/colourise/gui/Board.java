@@ -43,7 +43,7 @@ public class Board extends ProducerConsumerFrame<Message> {
         public void mouseExited(MouseEvent e) {}
     };
 
-    public Board(int scale, int id, int count, Map<Integer, Position> positions) {
+    public Board(int scale, int id, int count, Map<Integer, Position> positions, boolean spectate) {
         setTitle("Board");
         identifier = id;
         list = new PlayerList(scale, id, count);
@@ -54,7 +54,8 @@ public class Board extends ProducerConsumerFrame<Message> {
             grid.setColour(position.getValue().getRow(), position.getValue().getColumn(), Colours.getColour(position.getKey()));
         panel.add(grid, BorderLayout.WEST);
         panel.add(list, BorderLayout.EAST);
-        panel.add(cards, BorderLayout.NORTH);
+        if(!spectate)
+            panel.add(cards, BorderLayout.NORTH);
         add(panel);
         pack();
         setResizable(false);

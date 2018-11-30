@@ -19,8 +19,9 @@ public class Service implements Listener {
     private final Lobby<Connection> lobby;
     private final Server server;
     private final Set<Connection> disconnected = new HashSet<>();
-    private final Set<Connection> spectators = new HashSet<>();
-    private final Map<Match, Set<Connection>> spectating = new HashMap<>();
+    private final Set<Connection> spectate = new HashSet<>();
+    private final Map<Match, Set<Connection>> spectated = new HashMap<>();
+    private final Map<Connection, Match> spectating = new HashMap<>();
 
     public Service(InetSocketAddress address) throws IOException {
         if(address == null)
@@ -51,6 +52,12 @@ public class Service implements Listener {
         return players.get(connection);
     }
 
+    private Set<Connection> spectatorsOf(Match match) {
+        if(match == null)
+            throw new IllegalArgumentException("match");
+        return spectated.get(match);
+    }
+
     @Override
     public void connected(Connection connection) {
         if(connection == null)
@@ -64,19 +71,21 @@ public class Service implements Listener {
             throw new IllegalArgumentException("connection");
         try {
             if(spectator) {
-                spectators.add(connection);
+                spectate.add(connection);
                 write(connection, Message.Factory.joined(lobby.size()));
             } else {
                 lobby.join(connection);
-                write(lobby, Message.Factory.joined(lobby.size()));
+                Message message = Message.Factory.joined(lobby.size());
+                write(lobby, message);
+                write(spectate, message);
                 if (lobby.getLeader() == connection)
                     write(connection, Message.Factory.lead());
                 if (lobby.size() == lobby.capacity())
-                    started(lobby);
+                    started(lobby, spectate);
             }
         } catch(LobbyFullException ex) {
             // Shouldn't happen as size and capacity are checked.
-            started(lobby);
+            started(lobby, spectate);
             join(connection, spectator);
         }
     }
@@ -93,11 +102,18 @@ public class Service implements Listener {
             } catch(MatchFinishedException ex) {
                 finished(ex.getMatch());
             }
-        } else { // Player is in the lobby.
-            lobby.leave(connection);
+        } else if(lobby.leave(connection)) { // Player is in a lobby
             write(lobby, Message.Factory.left(lobby.size(), 0));
-            if(lobby.getLeader() != null)
+            if (lobby.getLeader() != null)
                 write(lobby.getLeader(), Message.Factory.lead());
+        } else {
+            Match match = spectating.get(connection);
+            if(match != null) {
+                spectating.remove(connection);
+                spectated.get(match).remove(connection);
+            } else {
+                spectate.remove(connection);
+            }
         }
         parsers.remove(connection);
     }
@@ -144,7 +160,7 @@ public class Service implements Listener {
                 break;
             case START:
                 if(connection == lobby.getLeader())
-                    started(lobby);
+                    started(lobby, spectate);
                 break;
         }
     }
@@ -160,7 +176,6 @@ public class Service implements Listener {
             case PLAY:
                 Card card = Card.fromInt(message.getArgument(2));
                 try {
-
                     player.play(message.getArgument(0), message.getArgument(1), card);
                     write(match, Message.Factory.played(player.getIdentifier(), message.getArgument(0), message.getArgument(1), card, match.getCurrent().getIdentifier()));
                 } catch (NotPlayersTurnException ex) {
@@ -208,13 +223,25 @@ public class Service implements Listener {
             throw new IllegalArgumentException("lobby");
         if(message == null)
             throw new IllegalArgumentException("message");
-        byte[] bytes = message.toBytes();
-        for(Connection connection : lobby.getWaiters())
+        write(lobby.getWaiters(), message);
+    }
+
+    private void write(Collection<Connection> connections, byte[] bytes) {
+        if(connections == null)
+            throw new IllegalArgumentException("connections");
+        if(bytes == null)
+            throw new IllegalArgumentException("bytes");
+        for(Connection connection : connections)
             write(connection, bytes);
     }
 
     private void write(Collection<Connection> connections, Message message) {
-
+        if(connections == null)
+            throw new IllegalArgumentException("connections");
+        if(message == null)
+            throw new IllegalArgumentException("message");
+        byte[] bytes = message.toBytes();
+        write(connections, bytes);
     }
 
     private void write(Match match, Message message) {
@@ -225,12 +252,16 @@ public class Service implements Listener {
         byte[] bytes = message.toBytes();
         for(Player player : match.getPlayers())
             write(connectionOf(player), bytes);
+        write(spectatorsOf(match), bytes);
     }
 
-    public void started(Lobby<Connection> lobby) {
+    public void started(Lobby<Connection> lobby, Set<Connection> spectators) {
         if(lobby == null)
             throw new IllegalArgumentException("connections");
         Match match = new Match(lobby.size());
+        spectated.put(match, new HashSet<>(spectators));
+        for(Connection connection : spectators)
+            spectating.put(connection, match);
         Iterator<Player> i1 = match.getPlayers().iterator();
         Iterator<Connection> i2 = lobby.getWaiters().iterator();
         int[] rows = new int[5];
@@ -259,6 +290,21 @@ public class Service implements Listener {
                     columns[4]
             ));
         }
+        write(spectators, Message.Factory.begin(
+                match.getPlayers().size(), // ID not in use, will never be selected to play
+                match.getPlayers().size(),
+                rows[0],
+                columns[0],
+                rows[1],
+                columns[1],
+                rows[2],
+                columns[2],
+                rows[3],
+                columns[3],
+                rows[4],
+                columns[4]
+        ));
+        spectators.clear();
         lobby.clear();
     }
 

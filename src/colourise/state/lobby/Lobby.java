@@ -43,9 +43,10 @@ public class Lobby<T> {
         leader = null;
     }
 
-    public void leave(T obj) {
-        waiting.remove(obj);
+    public boolean leave(T obj) {
+        boolean left = waiting.remove(obj);
         if(obj == leader)
             leader = waiting.isEmpty() ? null : waiting.iterator().next();
+        return left;
     }
 }

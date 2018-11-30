@@ -22,12 +22,13 @@ public class Controller extends RunnableConsumer<Message> {
     private Reader reader;
     private Parser parser;
     private Consumer<Message> forward = null;
+    private final boolean spectate;
 
     public Controller(Connection connection, boolean spectate) throws DisconnectedException {
         new Thread(reader = new Reader(connection)).start();
         reader.request(this);
         this.connection = connection;
-        write(Message.Factory.hello(spectate));
+        write(Message.Factory.hello(this.spectate = spectate));
     }
 
     private int write(Message message) throws DisconnectedException {
@@ -55,7 +56,7 @@ public class Controller extends RunnableConsumer<Message> {
                     Map<Integer, Position> positions = new HashMap<Integer, Position>(count);
                     for(int i = 0; i < count; i++)
                         positions.put(i, new Position(message.getArgument(2 + 2 * i), message.getArgument(3 + 2 * i)));
-                    board = new Board(25, message.getArgument(0), message.getArgument(1), positions);
+                    board = new Board(25, message.getArgument(0), message.getArgument(1), positions, spectate);
                     board.request(this);
                     board.setVisible(true);
                     forward = board;
