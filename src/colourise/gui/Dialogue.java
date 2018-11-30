@@ -80,6 +80,7 @@ public final class Dialogue extends JFrame {
         pack();
         setSize(250, getHeight());
         setResizable(false);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
     /**

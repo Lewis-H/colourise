@@ -50,6 +50,7 @@ public class Lobby extends ProducerConsumerFrame<Message> {
         pack();
         setSize(300, 200);
         setResizable(false);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
     /**

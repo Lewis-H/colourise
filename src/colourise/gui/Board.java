@@ -81,6 +81,7 @@ public final class Board extends ProducerConsumerFrame<Message> {
         add(panel, BorderLayout.SOUTH);
         pack();
         setResizable(false);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
     @Override

@@ -13,6 +13,7 @@ public final class ColouredGrid extends JComponent {
     private static final int ROWS = 6, COLUMNS = 10;
     // Colour grid
     private final Color[][] grid = new Color[ROWS][COLUMNS];
+    private final Font font;
 
     /**
      * Sets the square scale.
@@ -38,6 +39,7 @@ public final class ColouredGrid extends JComponent {
      * @param scale Square size
      */
     public ColouredGrid(int scale) {
+        font = new Font("Arial", Font.PLAIN, scale);
         setScale(scale);
         for(int r = 0; r < ROWS; r++)
             for(int c = 0; c < COLUMNS; c++)
@@ -82,6 +84,10 @@ public final class ColouredGrid extends JComponent {
                 g2.setColor(Color.BLACK);
                 g2.setStroke(outline);
                 g2.drawRect((c + 1) * scale,(r + 1) * scale, scale, scale);
+                g.setFont(font);
+                String colour = Colours.getName(grid[r][c]);
+                if(colour != "Unknown")
+                    g.drawString(colour.substring(0, 1), (int) Math.ceil((c + 1.1) * scale), (int) Math.ceil((r + 1.9) * scale));
             }
         }
     }

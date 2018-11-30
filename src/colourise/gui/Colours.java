@@ -44,4 +44,20 @@ public class Colours {
                 return "Unknown";
         }
     }
+
+    public static String getName(Color colour) {
+        if(colour == Color.RED) {
+            return "Red";
+        }else if(colour == Color.MAGENTA) {
+            return "Magenta";
+        }else if(colour == Color.YELLOW) {
+            return "Yellow";
+        }else if(colour == Color.GREEN) {
+            return "Green";
+        }else if(colour == Color.PINK) {
+            return "Pink";
+        }else{
+            return "Unknown";
+        }
+    }
 }

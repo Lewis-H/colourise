@@ -386,6 +386,7 @@ public class Service implements Listener {
             Connection connection = connectionOf(player);
             players.remove(connection);
             connection.disconnect();
+            disconnected.add(connection);
         }
     }
 }
